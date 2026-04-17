@@ -11,8 +11,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// ROUTES
 const authRoutes = require("./src/routes/auth");
 app.use("/auth", authRoutes);
+
+const artistRoutes = require("./src/routes/artist"); // 👈 MOVER PARA AQUI
+app.use("/artists", artistRoutes); // 👈 MOVER PARA AQUI
 
 app.get("/", (req, res) => {
   res.send("API is running...");

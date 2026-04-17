@@ -46,7 +46,6 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: "Username ou email já existe" });
     }
 
-    // hash
     const hashedPass = await bcrypt.hash(password, 10);
 
     const user = new User({
@@ -67,6 +66,8 @@ exports.register = async (req, res) => {
     res.status(500).json({ message: "Server error during registration" });
   }
 };
+
+
 exports.login = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -98,9 +99,10 @@ exports.login = async (req, res) => {
   }
 };
 
+
 exports.getProfile = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const { userId } = req.query; 
 
     const user = await User.findById(userId).populate("favoriteArtist");
 
@@ -121,9 +123,10 @@ exports.getProfile = async (req, res) => {
   }
 };
 
+
 exports.updateProfile = async (req, res) => {
   try {
-    const { userId, email, password, birthDate } = req.body;
+    const { userId, currentPassword, email, password, birthDate } = req.body; // ✅ FIX
 
     const user = await User.findById(userId);
 
@@ -131,12 +134,19 @@ exports.updateProfile = async (req, res) => {
       return res.status(404).json({ message: "User não encontrado" });
     }
 
-    // atualizar email
+    const match = await bcrypt.compare(currentPassword, user.password);
+    if (!match) {
+      return res.status(401).json({ message: "Password atual incorreta" });
+    }
+
     if (email) {
+      const existing = await User.findOne({ email });
+      if (existing && existing._id.toString() !== userId) {
+        return res.status(400).json({ message: "Email já em uso" });
+      }
       user.email = email;
     }
 
-    // atualizar password
     if (password) {
       const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
       if (!passwordRegex.test(password)) {
@@ -148,7 +158,6 @@ exports.updateProfile = async (req, res) => {
       user.password = await bcrypt.hash(password, 10);
     }
 
-    // atualizar birthDate
     if (birthDate) {
       user.birthDate = birthDate;
     }
