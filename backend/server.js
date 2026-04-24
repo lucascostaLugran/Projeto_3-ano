@@ -15,8 +15,11 @@ app.use(express.json());
 const authRoutes = require("./src/routes/auth");
 app.use("/auth", authRoutes);
 
-const artistRoutes = require("./src/routes/artist"); // 👈 MOVER PARA AQUI
-app.use("/artists", artistRoutes); // 👈 MOVER PARA AQUI
+const artistRoutes = require("./src/routes/artists"); 
+app.use("/artists", artistRoutes); 
+
+const albumRoutes = require("./src/routes/albums");
+app.use("/albums", albumRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is running...");

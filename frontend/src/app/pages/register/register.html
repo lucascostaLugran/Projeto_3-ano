@@ -1,0 +1,51 @@
+<img src="/logo.png" class="logo" alt="Sonexa logo" />
+
+<div class="login-container">
+
+  <div class="login-card">
+
+    <h2>Registar</h2>
+    <p class="subtitle">Cria a tua conta!</p>
+
+    <form (ngSubmit)="onRegister()">
+
+      <input type="text" placeholder="Username" [(ngModel)]="username" name="username" required />
+      <p class="hint">Apenas letras e números</p>
+
+      <input type="email" placeholder="Email" [(ngModel)]="email" name="email" required />
+
+      <div class="password-wrapper">
+
+        <input [type]="showPassword ? 'text' : 'password'" placeholder="Password" [(ngModel)]="password" name="password"
+          required />
+
+        <span class="toggle" (click)="showPassword = !showPassword">
+          {{ showPassword ? 'Hide' : 'Show' }}
+        </span>
+
+      </div>
+      <p class="hint">
+        Mín. 8 caracteres, 1 maiúscula, 1 minúscula e 1 número
+      </p>
+
+      <input type="date" [(ngModel)]="birthDate" name="birthDate" required />
+      <p class="hint">Tens de ter pelo menos 13 anos</p>
+
+      <button type="submit">Criar Conta</button>
+
+    </form>
+
+    <p class="error" *ngIf="error">{{ error }}</p>
+
+    <p class="register-text" *ngIf="message" style="color: #2cb67d">
+      {{ message }}
+    </p>
+
+    <p class="register-text">
+      Já tens conta?
+      <a routerLink="/login">Login</a>
+    </p>
+
+  </div>
+
+</div>

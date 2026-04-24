@@ -102,7 +102,7 @@ exports.login = async (req, res) => {
 
 exports.getProfile = async (req, res) => {
   try {
-    const { userId } = req.query; 
+    const { userId } = req.query;
 
     const user = await User.findById(userId).populate("favoriteArtist");
 
@@ -126,7 +126,7 @@ exports.getProfile = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
   try {
-    const { userId, currentPassword, email, password, birthDate } = req.body; // ✅ FIX
+    const { userId, currentPassword, username, email, password, birthDate } = req.body;
 
     const user = await User.findById(userId);
 
@@ -139,16 +139,40 @@ exports.updateProfile = async (req, res) => {
       return res.status(401).json({ message: "Password atual incorreta" });
     }
 
+    if (username) {
+      const usernameRegex = /^[a-zA-Z0-9]+$/;
+
+      if (!usernameRegex.test(username)) {
+        return res.status(400).json({
+          message: "Username só pode conter letras e números"
+        });
+      }
+
+      const existing = await User.findOne({ username });
+      if (existing && existing._id.toString() !== userId) {
+        return res.status(400).json({
+          message: "Username já existe"
+        });
+      }
+
+      user.username = username;
+    }
+
     if (email) {
       const existing = await User.findOne({ email });
+
       if (existing && existing._id.toString() !== userId) {
-        return res.status(400).json({ message: "Email já em uso" });
+        return res.status(400).json({
+          message: "Email já em uso"
+        });
       }
+
       user.email = email;
     }
 
     if (password) {
       const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+
       if (!passwordRegex.test(password)) {
         return res.status(400).json({
           message: "Password inválida"
@@ -159,6 +183,22 @@ exports.updateProfile = async (req, res) => {
     }
 
     if (birthDate) {
+      const birthDateObj = new Date(birthDate);
+      const today = new Date();
+
+      let age = today.getFullYear() - birthDateObj.getFullYear();
+      const m = today.getMonth() - birthDateObj.getMonth();
+
+      if (m < 0 || (m === 0 && today.getDate() < birthDateObj.getDate())) {
+        age--;
+      }
+
+      if (age < 13) {
+        return res.status(400).json({
+          message: "Deve ter pelo menos 13 anos"
+        });
+      }
+
       user.birthDate = birthDate;
     }
 

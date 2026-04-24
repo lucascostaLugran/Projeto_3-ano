@@ -1,0 +1,50 @@
+<img src="/logo.png" class="logo" alt="Sonexa logo" />
+
+<div class="login-container">
+
+  <div class="login-card">
+
+    <h2>Login</h2>
+    <p class="subtitle">Welcome back</p>
+
+    <!-- 🔥 NOVO -->
+    <p class="success" *ngIf="message">{{ message }}</p>
+
+    <form (ngSubmit)="onLogin()">
+
+      <input
+        type="text"
+        placeholder="Username"
+        [(ngModel)]="username"
+        name="username"
+        required
+      />
+
+      <!-- 🔥 PASSWORD COM TOGGLE -->
+      <div class="password-wrapper">
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          placeholder="Password"
+          [(ngModel)]="password"
+          name="password"
+          required
+        />
+        <span class="toggle" (click)="showPassword = !showPassword">
+          {{ showPassword ? 'Hide' : 'Show' }}
+        </span>
+      </div>
+
+      <button type="submit">Entrar</button>
+
+    </form>
+
+    <p class="error" *ngIf="error">{{ error }}</p>
+
+    <p class="register-text">
+      Não tens conta?
+      <a routerLink="/register">Registar</a>
+    </p>
+
+  </div>
+
+</div>

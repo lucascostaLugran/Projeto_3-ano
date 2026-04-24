@@ -1,1 +1,16 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --bg: #16161a;
+  --card: #1f1f26;
+  --primary: #7f5af0;
+  --text: #fffffe;
+  --text-secondary: #94a1b2;
+  --border: #27272e;
+  --accent: #2cb67d;
+} 
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  font-family: Arial, sans-serif;
+}

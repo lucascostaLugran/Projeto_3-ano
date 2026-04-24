@@ -5,7 +5,7 @@ const artistSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    match: /^[0-9]{16}$/ 
+    match: /^[0-9]{16}$/
   },
   name: {
     type: String,
@@ -16,7 +16,13 @@ const artistSchema = new mongoose.Schema({
     type: Number,
     required: true,
     min: 0
+  },
+  description: {         
+    type: String,
+    default: ""
   }
-}, { timestamps: true });
+}, {
+  timestamps: true
+});
 
 module.exports = mongoose.model('Artist', artistSchema);

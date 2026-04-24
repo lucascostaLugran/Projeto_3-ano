@@ -1,0 +1,43 @@
+<img src="/logo.png" class="logo" alt="Sonexa logo" />
+
+<div class="dashboard">
+
+  <div class="sidebar">
+    <button routerLink="/profile">Perfil</button>
+    <button>Favoritos</button>
+    <button (click)="logout()">Logout</button>
+  </div>
+
+  <div class="main">
+
+    <h1>Dashboard</h1>
+
+    <div class="search-box">
+      <input type="text" placeholder="Pesquisar artistas..." [(ngModel)]="searchTerm" (input)="onSearchChange()" />
+      <button (click)="search()">Pesquisar</button>
+    </div>
+
+    <div class="results">
+
+      <div *ngIf="error" class="error">{{ error }}</div>
+
+      <div *ngFor="let artist of artists" class="artist-card">
+
+        <h3 class="artist-name" [routerLink]="['/artist', artist._id]">
+          {{ artist.name }}
+        </h3>
+
+        <p class="artist-description">
+          {{ artist.description }}
+        </p>
+
+        <button class="fav-btn" (click)="addFavorite(artist._id)">
+          Favorito
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>
