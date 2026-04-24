@@ -1,5 +1,5 @@
 const Artist = require("../models/Artist");
-const User = require("../models/User");
+const Album = require("../models/Album");
 
 
 exports.createArtist = async (req, res) => {
@@ -191,80 +191,8 @@ exports.getArtistById = async (req, res) => {
 
   } catch (error) {
     console.error("Get artist error:", error);
-    res.status(500).json({
-      message: "Erro no servidor"
-    });
-  }
-};
-
-
-exports.addFavoriteArtist = async (req, res) => {
-  try {
-    const { userId } = req.body;
-    const { id } = req.params;
-
-    const user = await User.findById(userId);
-    const artist = await Artist.findById(id);
-
-    if (!user) {
-      return res.status(404).json({ message: "User não encontrado" });
-    }
-
-    if (!artist) {
-      return res.status(404).json({ message: "Artista não encontrado" });
-    }
-
-    if (user.favoriteArtist) {
-      return res.status(400).json({
-        message: "Já tens um artista favorito"
-      });
-    }
-
-    user.favoriteArtist = artist._id;
-    await user.save();
-
-    res.json({
-      message: "Artista adicionado como favorito"
-    });
-
-  } catch (error) {
-    console.error("Add favorite error:", error);
-    res.status(500).json({
-      message: "Erro no servidor"
-    });
-  }
-};
-
-
-exports.removeFavoriteArtist = async (req, res) => {
-  try {
-    const { userId } = req.body;
-
-    const user = await User.findById(userId);
-
-    if (!user) {
-      return res.status(404).json({
-        message: "User não encontrado"
-      });
-    }
-
-    if (!user.favoriteArtist) {
-      return res.status(400).json({
-        message: "Não tens artista favorito"
-      });
-    }
-
-    user.favoriteArtist = null;
-    await user.save();
-
-    res.json({
-      message: "Artista favorito removido"
-    });
-
-  } catch (error) {
-    console.error("Remove favorite error:", error);
-    res.status(500).json({
-      message: "Erro no servidor"
+    return res.status(400).json({
+      message: "Já existe um artista com este ISNI"
     });
   }
 };

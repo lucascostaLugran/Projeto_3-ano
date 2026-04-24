@@ -7,8 +7,6 @@ const {
   updateArtistsBulk,
   searchArtists, 
   getArtistById, 
-  addFavoriteArtist, 
-  removeFavoriteArtist 
 } = require("../controllers/artistController");
 
 
@@ -18,7 +16,5 @@ router.post("/bulk", createArtistsBulk);
 router.get("/search", searchArtists);
 router.get("/:id", getArtistById);
 
-router.post("/:id/favorite", addFavoriteArtist);
-router.delete("/favorite", removeFavoriteArtist);
 
 module.exports = router;

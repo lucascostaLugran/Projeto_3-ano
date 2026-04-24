@@ -114,7 +114,9 @@ exports.getProfile = async (req, res) => {
       username: user.username,
       email: user.email,
       birthDate: user.birthDate,
-      favoriteArtist: user.favoriteArtist
+      favoriteArtist: user.favoriteArtist,
+      description: user.description,
+      avatar: user.avatar
     });
 
   } catch (error) {
@@ -126,7 +128,7 @@ exports.getProfile = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
   try {
-    const { userId, currentPassword, username, email, password, birthDate } = req.body;
+    const { userId, currentPassword, username, email, password, birthDate, description, avatar } = req.body;
 
     const user = await User.findById(userId);
 
@@ -158,15 +160,15 @@ exports.updateProfile = async (req, res) => {
       user.username = username;
     }
 
-    if (email) {
+    if (email && email !== user.email) {
       const existing = await User.findOne({ email });
-
-      if (existing && existing._id.toString() !== userId) {
+    
+      if (existing) {
         return res.status(400).json({
           message: "Email já em uso"
         });
       }
-
+    
       user.email = email;
     }
 
@@ -201,6 +203,13 @@ exports.updateProfile = async (req, res) => {
 
       user.birthDate = birthDate;
     }
+    if (description !== undefined) {
+      user.description = description;
+    }
+    
+    if (avatar !== undefined) {
+      user.avatar = avatar;
+    }
 
     await user.save();
 
@@ -209,5 +218,91 @@ exports.updateProfile = async (req, res) => {
   } catch (error) {
     console.error("Update error:", error);
     res.status(500).json({ message: "Erro no servidor" });
+  }
+};
+
+exports.addFavoriteArtist = async (req, res) => {
+  try {
+    const { userId, artistId } = req.body;
+
+    if (!userId || !artistId) {
+      return res.status(400).json({
+        message: "UserId e artistId são obrigatórios"
+      });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User não encontrado"
+      });
+    }
+
+    if (user.favoriteArtist) {
+      return res.status(400).json({
+        message: "Já tem um artista favorito definido"
+      });
+    }
+
+    const artist = await Artist.findById(artistId);
+
+    if (!artist) {
+      return res.status(404).json({
+        message: "Artista não encontrado"
+      });
+    }
+
+    user.favoriteArtist = artistId;
+    await user.save();
+
+    res.json({
+      message: "Artista adicionado aos favoritos com sucesso"
+    });
+
+  } catch (error) {
+    console.error("Add favorite error:", error);
+    res.status(500).json({
+      message: "Erro no servidor"
+    });
+  }
+};
+
+exports.removeFavoriteArtist = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({
+        message: "UserId é obrigatório"
+      });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User não encontrado"
+      });
+    }
+
+    if (!user.favoriteArtist) {
+      return res.status(400).json({
+        message: "Não tem artista favorito definido"
+      });
+    }
+
+    user.favoriteArtist = null;
+    await user.save();
+
+    res.json({
+      message: "Artista removido dos favoritos com sucesso"
+    });
+
+  } catch (error) {
+    console.error("Remove favorite error:", error);
+    res.status(500).json({
+      message: "Erro no servidor"
+    });
   }
 };
