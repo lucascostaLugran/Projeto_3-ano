@@ -1,7 +1,5 @@
 const User = require("../models/User");
-const Artist = require("../models/Artist");
 const bcrypt = require("bcrypt");
-
 
 exports.register = async (req, res) => {
   try {
@@ -52,7 +50,8 @@ exports.register = async (req, res) => {
       username,
       email,
       password: hashedPass,
-      birthDate
+      birthDate,
+      favoriteArtist: null 
     });
 
     await user.save();
@@ -66,7 +65,6 @@ exports.register = async (req, res) => {
     res.status(500).json({ message: "Server error during registration" });
   }
 };
-
 
 exports.login = async (req, res) => {
   try {
@@ -99,8 +97,9 @@ exports.login = async (req, res) => {
   }
 };
 
-
+/* ================= PROFILE ================= */
 exports.getProfile = async (req, res) => {
+
   try {
     const { userId } = req.query;
 
@@ -114,7 +113,7 @@ exports.getProfile = async (req, res) => {
       username: user.username,
       email: user.email,
       birthDate: user.birthDate,
-      favoriteArtist: user.favoriteArtist,
+      favoriteArtist: user.favoriteArtist, 
       description: user.description,
       avatar: user.avatar
     });
@@ -125,10 +124,9 @@ exports.getProfile = async (req, res) => {
   }
 };
 
-
 exports.updateProfile = async (req, res) => {
   try {
-    const { userId, currentPassword, username, email, password, birthDate, description, avatar } = req.body;
+    const { userId, username, email, password, birthDate } = req.body;
 
     const user = await User.findById(userId);
 
@@ -136,21 +134,23 @@ exports.updateProfile = async (req, res) => {
       return res.status(404).json({ message: "User não encontrado" });
     }
 
-    const match = await bcrypt.compare(currentPassword, user.password);
-    if (!match) {
-      return res.status(401).json({ message: "Password atual incorreta" });
+    const usernameRegex = /^[a-zA-Z0-9]+$/;
+    if (username && !usernameRegex.test(username)) {
+      return res.status(400).json({
+        message: "Username só pode conter letras e números"
+      });
     }
 
-    if (username) {
-      const usernameRegex = /^[a-zA-Z0-9]+$/;
+    const emailRegex = /^\S+@\S+\.\S+$/;
+    if (email && !emailRegex.test(email)) {
+      return res.status(400).json({
+        message: "Email inválido"
+      });
+    }
 
-      if (!usernameRegex.test(username)) {
-        return res.status(400).json({
-          message: "Username só pode conter letras e números"
-        });
-      }
-
+    if (username && username !== user.username) {
       const existing = await User.findOne({ username });
+
       if (existing && existing._id.toString() !== userId) {
         return res.status(400).json({
           message: "Username já existe"
@@ -162,14 +162,18 @@ exports.updateProfile = async (req, res) => {
 
     if (email && email !== user.email) {
       const existing = await User.findOne({ email });
-    
-      if (existing) {
+
+      if (existing && existing._id.toString() !== userId) {
         return res.status(400).json({
           message: "Email já em uso"
         });
       }
-    
+
       user.email = email;
+    }
+
+    if (birthDate) {
+      user.birthDate = new Date(birthDate);
     }
 
     if (password) {
@@ -177,38 +181,11 @@ exports.updateProfile = async (req, res) => {
 
       if (!passwordRegex.test(password)) {
         return res.status(400).json({
-          message: "Password inválida"
+          message: "Password deve ter pelo menos 8 caracteres, uma maiúscula, uma minúscula e um número"
         });
       }
 
       user.password = await bcrypt.hash(password, 10);
-    }
-
-    if (birthDate) {
-      const birthDateObj = new Date(birthDate);
-      const today = new Date();
-
-      let age = today.getFullYear() - birthDateObj.getFullYear();
-      const m = today.getMonth() - birthDateObj.getMonth();
-
-      if (m < 0 || (m === 0 && today.getDate() < birthDateObj.getDate())) {
-        age--;
-      }
-
-      if (age < 13) {
-        return res.status(400).json({
-          message: "Deve ter pelo menos 13 anos"
-        });
-      }
-
-      user.birthDate = birthDate;
-    }
-    if (description !== undefined) {
-      user.description = description;
-    }
-    
-    if (avatar !== undefined) {
-      user.avatar = avatar;
     }
 
     await user.save();
@@ -217,54 +194,54 @@ exports.updateProfile = async (req, res) => {
 
   } catch (error) {
     console.error("Update error:", error);
+
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyValue)[0];
+      return res.status(400).json({
+        message: `${field} já está em uso`
+      });
+    }
+
     res.status(500).json({ message: "Erro no servidor" });
   }
 };
 
 exports.addFavoriteArtist = async (req, res) => {
+  const artistId = req.params.id;
+  const { userId } = req.body;
+
+  if (!userId || !artistId) {
+    return res.status(400).json({
+      message: "UserId e artistId são obrigatórios"
+    });
+  }
+
   try {
-    const { userId, artistId } = req.body;
-
-    if (!userId || !artistId) {
-      return res.status(400).json({
-        message: "UserId e artistId são obrigatórios"
-      });
-    }
-
     const user = await User.findById(userId);
 
     if (!user) {
-      return res.status(404).json({
-        message: "User não encontrado"
-      });
+      return res.status(404).json({ message: "User não encontrado" });
     }
 
     if (user.favoriteArtist) {
+      if (user.favoriteArtist.toString() === artistId) {
+        return res.status(400).json({
+          message: "Este artista já é o teu favorito"
+        });
+      }
+
       return res.status(400).json({
-        message: "Já tem um artista favorito definido"
-      });
-    }
-
-    const artist = await Artist.findById(artistId);
-
-    if (!artist) {
-      return res.status(404).json({
-        message: "Artista não encontrado"
+        message: "Já tens um artista favorito"
       });
     }
 
     user.favoriteArtist = artistId;
     await user.save();
 
-    res.json({
-      message: "Artista adicionado aos favoritos com sucesso"
-    });
+    res.json({ message: "Adicionado aos favoritos" });
 
-  } catch (error) {
-    console.error("Add favorite error:", error);
-    res.status(500).json({
-      message: "Erro no servidor"
-    });
+  } catch (err) {
+    res.status(500).json({ message: "Erro no servidor" });
   }
 };
 
@@ -272,23 +249,11 @@ exports.removeFavoriteArtist = async (req, res) => {
   try {
     const { userId } = req.body;
 
-    if (!userId) {
-      return res.status(400).json({
-        message: "UserId é obrigatório"
-      });
-    }
-
     const user = await User.findById(userId);
 
-    if (!user) {
-      return res.status(404).json({
-        message: "User não encontrado"
-      });
-    }
-
-    if (!user.favoriteArtist) {
+    if (!user || !user.favoriteArtist) {
       return res.status(400).json({
-        message: "Não tem artista favorito definido"
+        message: "Não tens artista favorito"
       });
     }
 
@@ -296,13 +261,13 @@ exports.removeFavoriteArtist = async (req, res) => {
     await user.save();
 
     res.json({
-      message: "Artista removido dos favoritos com sucesso"
+      message: "Favorito removido"
     });
 
   } catch (error) {
-    console.error("Remove favorite error:", error);
     res.status(500).json({
       message: "Erro no servidor"
     });
   }
 };
+

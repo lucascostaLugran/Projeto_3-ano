@@ -150,7 +150,7 @@ exports.searchArtists = async (req, res) => {
     }
 
     const artists = await Artist.find({
-      name: { $regex: name, $options: "i" }
+      name: { $regex: `^${name}`, $options: "i" }
     }).limit(10);
 
     if (artists.length === 0) {
@@ -182,7 +182,9 @@ exports.getArtistById = async (req, res) => {
       });
     }
 
-    const albums = await Album.find({ artist: id });
+    const albums = await Album.find({ artist: id })
+    .sort({ year: -1 })
+    .limit(5);
 
     res.json({
       artist,
@@ -191,8 +193,30 @@ exports.getArtistById = async (req, res) => {
 
   } catch (error) {
     console.error("Get artist error:", error);
-    return res.status(400).json({
-      message: "Já existe um artista com este ISNI"
+    return res.status(500).json({
+      message: "Erro no servidor"
+    });
+    }
+};
+exports.getArtistAlbums = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const albums = await Album.find({ artist: id })
+      .sort({ year: -1 });
+
+    if (albums.length === 0) {
+      return res.status(404).json({
+        message: "Nenhum álbum encontrado"
+      });
+    }
+
+    res.json(albums);
+
+  } catch (error) {
+    console.error("Get artist albums error:", error);
+    res.status(500).json({
+      message: "Erro no servidor"
     });
   }
 };

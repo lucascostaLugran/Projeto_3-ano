@@ -24,11 +24,13 @@ const userSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
+
   favoriteArtist: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Artist',
     default: null
   }
+
 }, { timestamps: true });
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.models.User || mongoose.model('User', userSchema);
