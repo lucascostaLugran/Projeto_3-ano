@@ -27,10 +27,14 @@ export class Login {
   ) {}
 
   ngOnInit() {
-    const msg = localStorage.getItem("successMessage");
-    if (msg) {
-      this.message = msg;
-      localStorage.removeItem("successMessage");
+
+    if (typeof window !== 'undefined') {
+      const msg = localStorage.getItem("successMessage");
+
+      if (msg) {
+        this.message = msg;
+        localStorage.removeItem("successMessage");
+      }
     }
   }
 
@@ -43,7 +47,11 @@ export class Login {
     })
     .subscribe({
       next: (res: any) => {
-        localStorage.setItem('userId', res.userId);
+
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('userId', res.userId);
+        }
+
         this.router.navigate(['/dashboard']);
       },
       error: (err: any) => {

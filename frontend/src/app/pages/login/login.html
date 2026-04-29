@@ -1,4 +1,6 @@
-<img src="/logo.png" class="logo" alt="Sonexa logo" />
+<div class="logo-container">
+  <img src="/assets/logo.png" class="logo" alt="Sonexa logo" />
+</div>
 
 <div class="login-container">
 
@@ -7,7 +9,6 @@
     <h2>Login</h2>
     <p class="subtitle">Welcome back</p>
 
-    <!-- 🔥 NOVO -->
     <p class="success" *ngIf="message">{{ message }}</p>
 
     <form (ngSubmit)="onLogin()">
@@ -20,7 +21,6 @@
         required
       />
 
-      <!-- 🔥 PASSWORD COM TOGGLE -->
       <div class="password-wrapper">
         <input
           [type]="showPassword ? 'text' : 'password'"

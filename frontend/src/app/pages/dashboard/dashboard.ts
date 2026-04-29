@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-dashboard',
@@ -22,10 +23,17 @@ export class Dashboard implements OnInit {
   message = '';
   error = '';
 
-  constructor(private http: HttpClient, private router: Router) {}
+
+  constructor(private http: HttpClient, private router: Router, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
-    this.userId = localStorage.getItem('userId') || '';
+
+  
+    if (typeof window !== 'undefined') {
+      this.userId = localStorage.getItem('userId') || '';
+    }
+
+    console.log("DASHBOARD USER ID:", this.userId);
 
     if (!this.userId) {
       this.router.navigate(['/login']);
@@ -33,12 +41,14 @@ export class Dashboard implements OnInit {
     }
 
     this.loadProfile();
+
   }
 
   loadProfile() {
     this.http.get(`http://localhost:3000/auth/profile?userId=${this.userId}`)
       .subscribe({
         next: (res: any) => {
+          console.log("DASH PROFILE:", res);
           this.user = res;
         },
         error: () => {
@@ -61,50 +71,38 @@ export class Dashboard implements OnInit {
     });
   }
 
-  // 🔥 BOTÃO NORMAL (continua a funcionar)
   search() {
     this.error = '';
     this.message = '';
 
-    if (!this.searchTerm.trim()) {
+    const term = this.searchTerm.trim();
+
+    if (!term) {
+      this.artists = [];
       this.error = 'Introduza um nome de artista.';
       return;
     }
 
-    this.http.get(`http://localhost:3000/artists/search?name=${this.searchTerm}`)
+    this.http.get(`http://localhost:3000/artists/search?name=${term}`)
       .subscribe({
         next: (res: any) => {
           this.artists = res;
+          this.cdr.detectChanges();
         },
         error: (err: any) => {
           this.artists = [];
           this.error = err.error?.message || 'Nenhum artista encontrado.';
+          this.cdr.detectChanges();
         }
       });
   }
 
-  // 🔥 SMART SEARCH (AUTO)
-  onSearchChange() {
-    this.error = '';
 
-    if (this.searchTerm.length < 2) {
-      this.artists = [];
-      return;
-    }
-
-    this.http.get(`http://localhost:3000/artists/search?name=${this.searchTerm}`)
-      .subscribe({
-        next: (res: any) => {
-          this.artists = res;
-        },
-        error: () => {
-          this.artists = [];
-        }
-      });
-  }
 
   logout() {
-    localStorage.removeItem('userId');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('userId');
+    }
     this.router.navigate(['/login']);
   }
 }

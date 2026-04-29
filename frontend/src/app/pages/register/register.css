@@ -1,23 +1,28 @@
-
-.logo {
-  position: absolute;
-  top: -60px;
-  left: -130px;
-  height: 300px;
+.logo-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
 }
 
+.logo {
+  height: clamp(180px, 14vw, 260px);
+  transform: translate(-20%, -10%);
+}
 .login-container {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 20px; 
 }
 
 .login-card {
   background: var(--bg);
   padding: 40px;
   border-radius: 16px;
-  width: 400px;
+  width: 100%;
+  max-width: 420px; 
   text-align: center;
 }
 
@@ -100,7 +105,7 @@
 
 .password-wrapper input {
   width: 100%;
-  padding-right: 40px; /* espaço para o ícone */
+  padding-right: 40px;
 }
 
 .toggle {

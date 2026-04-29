@@ -1,0 +1,125 @@
+.dashboard {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.logo-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.logo {
+  height: clamp(180px, 14vw, 260px);
+  transform: translate(-20%, -10%);
+}
+
+.sidebar {
+  width: 220px;
+  min-width: 200px;
+  background: var(--card);
+  padding: 155px 20px 30px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  border-right: 1px solid var(--border);
+  position: relative;
+}
+
+.sidebar button {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  text-align: left;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.2s;
+  width: 100%;
+}
+
+.sidebar button:hover {
+  background: var(--primary);
+  color: var(--text);
+}
+
+.main {
+  flex: 1;
+  padding: 40px;
+  color: var(--text);
+  display: flex;
+  justify-content: center;
+}
+
+.artist-container {
+  width: 100%;
+  max-width: 1100px;
+}
+
+.artist-name {
+  color: var(--primary);
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.artist-info p {
+  color: var(--text-secondary);
+  margin: 5px 0;
+}
+
+.section-title {
+  margin-top: 30px;
+  margin-bottom: 15px;
+}
+
+.albums {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.album-card {
+  background: var(--card);
+  padding: 15px 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: 0.2s;
+}
+
+.album-card:hover {
+  background: #1f1f2e;
+}
+
+.album-title {
+  font-weight: 500;
+}
+
+.album-year {
+  color: var(--primary);
+  font-weight: bold;
+}
+
+.fav-btn {
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.fav-btn:hover {
+  transform: scale(1.2);
+}
+
+.artist-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}

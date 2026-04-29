@@ -1,22 +1,29 @@
+.logo-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
 .logo {
-  position: absolute;
-  top: -60px;
-  left: -130px;
-  height: 300px;
+  height: clamp(180px, 14vw, 260px);
+  transform: translate(-20%, -10%);
 }
 
 .login-container {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 20px;
 }
 
 .login-card {
   background: var(--bg);
   padding: 40px;
   border-radius: 16px;
-  width: 400px; /* maior */
+  width: 100%;
+  max-width: 420px;
   text-align: center;
 }
 
@@ -27,7 +34,7 @@
 }
 
 .login-card h2 {
-  color: var(--text); /* branco, não preto */
+  color: var(--text);
   margin-bottom: 10px;
 }
 
@@ -39,16 +46,15 @@
 .login-card input {
   width: 100%;
   padding: 14px;
-  margin-bottom: 15px;
   border-radius: 10px;
   border: 1px solid var(--border);
   background: #cfd6e1;
   font-size: 14px;
-  box-sizing: border-box; /* 🔥 garante alinhamento */
+  box-sizing: border-box;
 }
 
 .login-card button {
-  width: 100%; /* 🔥 IGUAL aos inputs */
+  width: 100%;
   padding: 14px;
   border: none;
   border-radius: 10px;
@@ -63,6 +69,7 @@
   opacity: 0.9;
 }
 
+/* LINKS */
 .login-card a {
   color: var(--primary);
   text-decoration: none;
@@ -70,7 +77,7 @@
 }
 
 .register-text {
-  color: var(--text-secondary); /* #94a1b2 */
+  color: var(--text-secondary);
   margin-top: 15px;
 }
 
@@ -78,6 +85,7 @@
   color: var(--primary);
 }
 
+/* MESSAGES */
 .error {
   color: red;
   margin-top: 10px;
@@ -88,6 +96,7 @@
   margin-bottom: 10px;
 }
 
+/* PASSWORD */
 .password-wrapper {
   position: relative;
   display: flex;
@@ -102,7 +111,6 @@
 .toggle {
   position: absolute;
   right: 10px;
-  top: 15px;
   cursor: pointer;
   font-size: 16px;
   opacity: 0.7;

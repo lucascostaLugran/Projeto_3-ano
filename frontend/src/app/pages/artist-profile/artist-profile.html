@@ -1,1 +1,56 @@
-<p>artist-profile works!</p>
+<div class="dashboard">
+
+  <div class="logo-container">
+    <img src="/assets/logo.png" class="logo" />
+  </div>
+
+  <div class="sidebar">
+    <button routerLink="/dashboard">Dashboard</button>
+    <button routerLink="/profile">Perfil</button>
+    <button (click)="logout()">Logout</button>
+  </div>
+
+  <div class="main">
+
+    <div *ngIf="message" class="toast">
+      {{ message }}
+    </div>
+
+    <div *ngIf="artist" class="artist-container">
+
+      <div class="artist-header">
+
+        <div class="artist-top">
+          <h1 class="artist-name">{{ artist.name }}</h1>
+
+          <button class="fav-btn" (click)="toggleFavorite()">
+            <span *ngIf="!isFavorite">🤍</span>
+            <span *ngIf="isFavorite">❤️</span>
+          </button>
+        </div>
+
+        <div class="artist-info">
+          <p><strong>ISNI:</strong> {{ artist.isni }}</p>
+          <p><strong>Ano de início:</strong> {{ artist.startYear }}</p>
+        </div>
+
+      </div>
+
+      <h2 class="section-title">Álbuns recentes</h2>
+
+      <div class="albums">
+        <div *ngFor="let album of albums" class="album-card">
+          <p class="album-title">{{ album.title }}</p>
+          <span class="album-year">{{ album.year }}</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div *ngIf="!artist">
+      A carregar artista...
+    </div>
+
+  </div>
+
+</div>

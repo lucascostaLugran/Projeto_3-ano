@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -9,30 +9,30 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [FormsModule, CommonModule, RouterModule],
   templateUrl: './profile.html',
-  styleUrls: ['./profile.css'] // 🔥 CORREÇÃO IMPORTANTE
-  
+  styleUrls: ['./profile.css']
 })
 export class Profile {
 
   user: any = null;
   userId = '';
 
-  // campos editáveis
-  email = '';
-  password = '';
-  birthDate = '';
-  currentPassword = '';
-  description = '';
+  isEditing = false;
 
-  message = '';
+  editData: any = {
+    username: '',
+    email: '',
+    birthDate: '',
+    password: ''
+  };
+
+  showPassword = false;
   error = '';
 
-  // 🔥 avatar
-  selectedFile: any = null;
-  previewUrl: any = null;
-  
-
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit() {
     if (typeof window !== 'undefined') {
@@ -51,14 +51,8 @@ export class Profile {
     this.http.get(`http://localhost:3000/auth/profile?userId=${this.userId}`)
       .subscribe({
         next: (res: any) => {
-          this.user = res;
-
-          this.email = res.email;
-          this.birthDate = res.birthDate?.substring(0, 10);
-          this.description = res.description || '';
-
-          // 🔥 carregar avatar existente
-          this.previewUrl = res.avatar || null;
+          this.user = { ...res };
+          this.cdr.detectChanges();
         },
         error: () => {
           this.error = 'Erro ao carregar perfil';
@@ -66,74 +60,74 @@ export class Profile {
       });
   }
 
-  // 🔥 selecionar imagem + preview
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
-  
-    if (!file) return;
-  
-    const MAX_SIZE = 2 * 1024 * 1024; // 2MB
-  
-    // 🔥 validar tamanho
-    if (file.size > MAX_SIZE) {
-      this.error = 'Imagem demasiado grande (máx: 2MB)';
-      this.selectedFile = null;
-      this.previewUrl = null;
-      return;
-    }
-  
-    // 🔥 limpar erro anterior
-    this.error = '';
-  
-    this.selectedFile = file;
-  
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.previewUrl = reader.result;
+  // 🔥 ABRIR MODAL COM DADOS ATUAIS
+  openEdit() {
+    this.editData = {
+      username: this.user?.username || '',
+      email: this.user?.email || '',
+      birthDate: this.user?.birthDate?.substring(0, 10) || '',
+      password: ''
     };
-  
-    reader.readAsDataURL(file);
-  
+
+    this.isEditing = true;
   }
 
+  // 🔥 ATUALIZAR PERFIL
   updateProfile() {
-    this.message = '';
-    this.error = '';
 
     const body: any = {
-      userId: this.userId,
-      currentPassword: this.currentPassword
+      userId: this.userId
     };
 
-    if (this.email) body.email = this.email;
-    if (this.password) body.password = this.password;
-    if (this.birthDate) body.birthDate = this.birthDate;
-    body.description = this.description;
-
-    // 🔥 enviar avatar (base64)
-    if (this.previewUrl) {
-      body.avatar = this.previewUrl;
-    }
+    if (this.editData.username) body.username = this.editData.username;
+    if (this.editData.email) body.email = this.editData.email;
+    if (this.editData.birthDate) body.birthDate = this.editData.birthDate;
+    if (this.editData.password) body.password = this.editData.password;
 
     this.http.put('http://localhost:3000/auth/profile', body)
       .subscribe({
-        next: (res: any) => {
-          this.message = res.message;
-          this.password = '';
-          this.currentPassword = '';
-          this.loadProfile();
+        next: () => {
+          this.isEditing = false;
+          this.loadProfile(); // refresh UI
         },
-        error: (err) => {
-          this.error = err.error?.message || 'Erro ao atualizar perfil';
+        error: () => {
+          this.error = 'Erro ao atualizar perfil';
         }
       });
   }
 
-  goBack() {
-    this.router.navigate(['/dashboard']);
+  removeFavorite() {
+  this.http.delete('http://localhost:3000/auth/favorite', {
+    body: { userId: this.userId }
+  }).subscribe({
+    next: (res: any) => {
+
+      this.user.favoriteArtist = null;
+
+      this.cdr.detectChanges();
+
+      this.isEditing = false;
+
+      // opcional (se quiseres garantir sync com backend)
+      // this.loadProfile();
+
+      console.log(res.message); // "Favorito removido"
+    },
+    error: (err) => {
+      console.log(err);
+      this.error = err.error?.message || 'Erro ao remover artista favorito';
+    }
+  });
+}
+
+  logout() {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('userId');
+    }
+    this.router.navigate(['/login']);
   }
 
-  goToProfile() {
-    this.router.navigate(['/profile']);
+  goBack() {
+    this.router.navigate(['/dashboard']);
   }
 }

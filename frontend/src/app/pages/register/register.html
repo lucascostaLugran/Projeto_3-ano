@@ -1,4 +1,6 @@
-<img src="/logo.png" class="logo" alt="Sonexa logo" />
+<div class="logo-container">
+  <img src="/assets/logo.png" class="logo" alt="Sonexa logo" />
+</div>
 
 <div class="login-container">
 
@@ -16,14 +18,18 @@
 
       <div class="password-wrapper">
 
-        <input [type]="showPassword ? 'text' : 'password'" placeholder="Password" [(ngModel)]="password" name="password"
-          required />
+        <input [type]="showPassword ? 'text' : 'password'"
+               placeholder="Password"
+               [(ngModel)]="password"
+               name="password"
+               required />
 
         <span class="toggle" (click)="showPassword = !showPassword">
           {{ showPassword ? 'Hide' : 'Show' }}
         </span>
 
       </div>
+
       <p class="hint">
         Mín. 8 caracteres, 1 maiúscula, 1 minúscula e 1 número
       </p>

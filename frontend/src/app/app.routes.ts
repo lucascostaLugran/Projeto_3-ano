@@ -14,6 +14,5 @@ export const routes: Routes = [
   { path: 'artist/:id', component: ArtistProfile },
 
   { path: '', redirectTo: 'login', pathMatch: 'full' },
-
   { path: '**', redirectTo: 'login' }
 ];

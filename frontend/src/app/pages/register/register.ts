@@ -44,7 +44,6 @@ export class Register {
       .subscribe({
         next: (res: any) => {
 
-          // guardar mensagem para login
           localStorage.setItem("successMessage", "Conta criada com sucesso!");
 
           this.router.navigate(['/login']);
