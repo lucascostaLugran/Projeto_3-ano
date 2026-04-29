@@ -13,22 +13,24 @@
 
     <form (ngSubmit)="onLogin()">
 
-      <input
-        type="text"
-        placeholder="Username"
-        [(ngModel)]="username"
-        name="username"
-        required
-      />
+      <div class="input-group">
+        <input
+          type="text"
+          [(ngModel)]="username"
+          name="username"
+          required
+        />
+        <label>Username</label>
+      </div>
 
-      <div class="password-wrapper">
+      <div class="password-wrapper input-group">
         <input
           [type]="showPassword ? 'text' : 'password'"
-          placeholder="Password"
           [(ngModel)]="password"
           name="password"
           required
         />
+        <label>Password</label>
         <span class="toggle" (click)="showPassword = !showPassword">
           {{ showPassword ? 'Hide' : 'Show' }}
         </span>

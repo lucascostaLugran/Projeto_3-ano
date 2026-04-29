@@ -5,8 +5,17 @@
   </div>
 
   <div class="sidebar">
-    <button routerLink="/dashboard">Dashboard</button>
-    <button (click)="logout()">Logout</button>
+    <button routerLink="/dashboard">🏠 Home</button>
+  
+    <div class="sidebar-bottom">
+      <button 
+        class="user-display" 
+        routerLink="/profile"
+      >
+        👤 {{ user.username }}
+      </button>
+      <button (click)="logout()">⏻ Logout</button>
+    </div>
   </div>
 
   <div class="main">
@@ -15,7 +24,7 @@
 
     <p *ngIf="!user" class="loading">A carregar perfil...</p>
 
-    <button class="edit-btn" (click)="isEditing = true">
+    <button class="edit-btn" (click)="openEdit()">
       Editar Perfil
     </button>
 
@@ -40,15 +49,24 @@
 
       <div class="row">
         <span class="label">Artista Favorito</span>
-        <span class="value">
-          {{ user.favoriteArtist?.name || 'Nenhum artista definido' }}
-        </span>
+      
+        <ng-container *ngIf="user.favoriteArtist; else noArtist">
+          <span 
+            class="value artist-link"
+            [routerLink]="['/artist', user.favoriteArtist._id]"
+          >
+            🎧 {{ user.favoriteArtist.name }}
+          </span>
+        </ng-container>
+      
+        <ng-template #noArtist>
+          <span class="value">Nenhum artista definido</span>
+        </ng-template>
       </div>
 
     </div>
 
     <p *ngIf="error" class="error">{{ error }}</p>
-
 
     <div class="modal-overlay" *ngIf="isEditing">
 
@@ -56,20 +74,48 @@
 
         <h2>Editar Perfil</h2>
 
-        <input [(ngModel)]="editData.username" placeholder="Username" />
-        <input [(ngModel)]="editData.email" placeholder="Email" />
-        <input type="date" [(ngModel)]="editData.birthDate" />
+        <div class="input-group">
+          <input [(ngModel)]="editData.username" placeholder=" " />
+          <label>Username</label>
+        </div>
+
+        <div class="input-group">
+          <input [(ngModel)]="editData.email" placeholder=" " />
+          <label>Email</label>
+        </div>
+
+        <div class="input-group">
+          <input type="date" [(ngModel)]="editData.birthDate" placeholder=" " />
+          <label>Data de nascimento</label>
+        </div>
 
         <div *ngIf="user && user.favoriteArtist !== null" class="fav-remove">
           <button (click)="removeFavorite()">Remover artista favorito</button>
         </div>
 
-        <div class="password-wrapper">
-          <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="editData.password"
-            placeholder="Nova password" />
-
+        <div class="password-wrapper input-group">
+          <input 
+            [type]="showPassword ? 'text' : 'password'" 
+            [(ngModel)]="editData.password"
+            placeholder=" "
+          />
+          <label>Nova password</label>
+        
           <span (click)="showPassword = !showPassword">
             {{ showPassword ? 'Hide' : 'Show' }}
+          </span>
+        </div>
+
+        <div class="password-wrapper input-group">
+          <input 
+            [type]="showConfirmPassword ? 'text' : 'password'" 
+            [(ngModel)]="editData.confirmPassword"
+            placeholder=" "
+          />
+          <label>Confirmar password</label>
+        
+          <span (click)="showConfirmPassword = !showConfirmPassword">
+            {{ showConfirmPassword ? 'Hide' : 'Show' }}
           </span>
         </div>
 

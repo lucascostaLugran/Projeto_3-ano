@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router, RouterModule } from '@angular/router';
@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './register.html',
   styleUrl: './register.css'
 })
-export class Register {
+export class Register implements OnInit {
 
   username = '';
   email = '';
@@ -29,6 +29,17 @@ export class Register {
     private cdr: ChangeDetectorRef 
   ) {}
 
+  ngOnInit() {
+    this.resetForm();
+  }
+
+  resetForm() {
+    this.username = '';
+    this.email = '';
+    this.password = '';
+    this.birthDate = '';
+  }
+
   onRegister() {
     this.message = '';
     this.error = '';
@@ -42,17 +53,15 @@ export class Register {
 
     this.http.post('http://localhost:3000/auth/register', body)
       .subscribe({
-        next: (res: any) => {
+        next: () => {
 
           localStorage.setItem("successMessage", "Conta criada com sucesso!");
+
+          this.resetForm();
 
           this.router.navigate(['/login']);
         },
         error: (err: any) => {
-
-          console.log("ERRO COMPLETO:", err);
-          console.log("BODY:", err.error);
-          console.log("MESSAGE:", err.error?.message);
 
           this.error =
             err.error?.message ||

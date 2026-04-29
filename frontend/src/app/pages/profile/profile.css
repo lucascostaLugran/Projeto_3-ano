@@ -29,7 +29,6 @@
   gap: 15px;
   border-right: 1px solid #2a2a3a;
   position: relative;
-
 }
 
 .sidebar button {
@@ -46,6 +45,43 @@
 }
 
 .sidebar button:hover {
+  background: #232336;
+  color: white;
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 20px;
+  border-top: 1px solid #2a2a3a;
+}
+
+.username {
+  color: #7f5af0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.user-display {
+  background: none;
+  border: none;
+  color: #7f5af0;
+  text-align: left;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-display:hover {
   background: #232336;
   color: white;
 }
@@ -97,7 +133,6 @@
   margin-top: 20px;
 }
 
-
 .edit-btn {
   margin-top: 20px;
   padding: 10px 20px;
@@ -113,40 +148,31 @@
   opacity: 0.85;
 }
 
-
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-
   background: rgba(0, 0, 0, 0.75);
-
   display: flex;
   justify-content: center;
   align-items: center;
-
-  z-index: 999; 
+  z-index: 999;
 }
-
 
 .modal {
   background: #16161f;
   border: 1px solid #2a2a3a;
   border-radius: 12px;
   padding: 30px;
-
   width: 100%;
   max-width: 420px;
-
   display: flex;
   flex-direction: column;
   gap: 15px;
-
   animation: fadeIn 0.2s ease;
 }
-
 
 .modal input {
   padding: 12px;
@@ -154,18 +180,28 @@
   border: none;
   background: #cfd6e1;
   color: #000;
+  width: 100%;
+  box-sizing: border-box;
 }
-
 
 .password-wrapper {
   position: relative;
-  display: flex;
-  align-items: center;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding: 18px 40px 10px 12px;
+  border-radius: 8px;
+  border: none;
+  background: #cfd6e1;
+  color: #000;
 }
 
 .password-wrapper span {
   position: absolute;
-  right: 10px;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
   font-size: 13px;
   cursor: pointer;
   opacity: 0.7;
@@ -174,7 +210,6 @@
 .password-wrapper span:hover {
   opacity: 1;
 }
-
 
 .modal-actions {
   display: flex;
@@ -199,9 +234,7 @@
   color: #ccc;
 }
 
-
 @media (max-width: 768px) {
-
   .dashboard {
     flex-direction: column;
   }
@@ -242,4 +275,58 @@
 .fav-remove button:hover {
   background: #ff4d4d;
   color: white;
+}
+
+.input-group {
+  position: relative;
+  width: 100%;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 16px 12px 10px 10px;
+  border-radius: 8px;
+  border: none;
+  background: #cfd6e1;
+  color: #000;
+}
+
+.input-group label {
+  position: absolute;
+  left: 10px;
+  top: 14px;
+  color: #555;
+  font-size: 13px;
+  pointer-events: none;
+  transition: 0.2s;
+}
+
+.input-group input:focus + label,
+.input-group input:not(:placeholder-shown) + label {
+  top: 4px;
+  font-size: 11px;
+  color: #7f5af0;
+}
+.artist-link {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+
+  background: rgba(127, 90, 240, 0.15);
+  color: #7f5af0;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  cursor: pointer;
+  transition: 0.2s ease;
+
+  width: fit-content;
+}
+
+.artist-link:hover {
+  background: #7f5af0;
+  color: white;
+  transform: translateY(-1px);
 }

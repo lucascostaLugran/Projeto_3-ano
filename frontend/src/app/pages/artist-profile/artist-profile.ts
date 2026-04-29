@@ -19,6 +19,10 @@ export class ArtistProfile implements OnInit {
   userId = '';
   message = '';
 
+  user: any = {
+    username: ''
+  };
+
   constructor(
     private route: ActivatedRoute,
     private http: HttpClient,
@@ -31,7 +35,9 @@ export class ArtistProfile implements OnInit {
 
     if (!id) return;
 
-    this.userId = localStorage.getItem('userId') || '';
+    if (typeof window !== 'undefined') {
+      this.userId = localStorage.getItem('userId') || '';
+    }
 
     this.http.get(`http://localhost:3000/artists/${id}`)
       .subscribe({
@@ -43,8 +49,9 @@ export class ArtistProfile implements OnInit {
 
           if (this.userId) {
             this.http.get(`http://localhost:3000/auth/profile?userId=${this.userId}`)
-              .subscribe((user: any) => {
-                this.isFavorite = user.favorites?.includes(this.artist._id);
+              .subscribe((res: any) => {
+                this.user = { ...res };
+                this.cdr.detectChanges();
               });
           }
         },
@@ -55,38 +62,39 @@ export class ArtistProfile implements OnInit {
   }
 
   logout() {
-    localStorage.removeItem('userId');
-    this.router.navigate(['/login']);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('userId');
+    }
   }
 
-toggleFavorite() {
-  if (!this.userId || !this.artist) return;
+  toggleFavorite() {
+    if (!this.userId || !this.artist) return;
 
-  this.http.post(`http://localhost:3000/artists/${this.artist._id}/favorite`, {
-    userId: this.userId
-  }).subscribe({
-next: (res: any) => {
-  this.isFavorite = !this.isFavorite;
+    this.http.post(`http://localhost:3000/artists/${this.artist._id}/favorite`, {
+      userId: this.userId
+    }).subscribe({
+      next: (res: any) => {
+        this.isFavorite = !this.isFavorite;
 
-  this.message = res.message || 'Atualizado com sucesso';
+        this.message = res.message || 'Atualizado com sucesso';
 
-  this.cdr.detectChanges(); 
+        this.cdr.detectChanges(); 
 
-  setTimeout(() => {
-    this.message = '';
-    this.cdr.detectChanges(); 
-  }, 2000);
-},
-error: (err: any) => {
-  this.message = err.error?.message || 'Erro ao atualizar favorito';
+        setTimeout(() => {
+          this.message = '';
+          this.cdr.detectChanges(); 
+        }, 2000);
+      },
+      error: (err: any) => {
+        this.message = err.error?.message || 'Erro ao atualizar favorito';
 
-  this.cdr.detectChanges(); 
+        this.cdr.detectChanges(); 
 
-  setTimeout(() => {
-    this.message = '';
-    this.cdr.detectChanges(); 
-  }, 2000);
-}
-  });
-}
+        setTimeout(() => {
+          this.message = '';
+          this.cdr.detectChanges(); 
+        }, 2000);
+      }
+    });
+  }
 }

@@ -3,10 +3,18 @@
 </div>
 
 <div class="dashboard">
-
   <div class="sidebar">
-    <button routerLink="/profile">Perfil</button>
-    <button (click)="logout()">Logout</button>
+    <button routerLink="/dashboard">🏠 Home</button>
+
+    <div class="sidebar-bottom">
+      <button 
+        class="user-display" 
+        routerLink="/profile"
+      >
+        👤 {{ user.username }}
+      </button>
+      <button (click)="logout()">⏻ Logout</button>
+    </div>
   </div>
 
   <div class="main">
@@ -14,15 +22,20 @@
     <h1>Dashboard</h1>
 
     <div class="search-box">
-      <input 
-        type="text" 
-        placeholder="Pesquisar artistas..." 
-        [(ngModel)]="searchTerm" 
-      />
+
+      <div class="input-group">
+        <input 
+          type="text"
+          placeholder=" "
+          [(ngModel)]="searchTerm"
+        />
+        <label>Pesquisar artistas...</label>
+      </div>
     
       <button type="button" (click)="search()">
         Pesquisar
       </button>
+    
     </div>
 
     <div class="results">

@@ -47,6 +47,37 @@
   color: var(--text);
 }
 
+.sidebar-bottom {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.user-display {
+  background: none;
+  border: none;
+  color: #7f5af0;
+  text-align: left;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-display:hover {
+  background: var(--primary);
+  color: var(--text);
+}
+
 .main {
   flex: 1;
   padding: 40px;
@@ -97,8 +128,20 @@
   background: #1f1f2e;
 }
 
+.album-info {
+  display: flex;
+  flex-direction: column;
+}
+
 .album-title {
   font-weight: 500;
+}
+
+.album-type {
+  font-size: 16px;
+  font-weight: 600;
+  opacity: 0.85;
+  margin-top: 4px;
 }
 
 .album-year {

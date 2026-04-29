@@ -14,7 +14,10 @@ import { ChangeDetectorRef } from '@angular/core';
 })
 export class Dashboard implements OnInit {
 
-  user: any = null;
+  user: any = {
+    username: ''
+  };
+
   userId = '';
 
   searchTerm = '';
@@ -23,17 +26,17 @@ export class Dashboard implements OnInit {
   message = '';
   error = '';
 
-
-  constructor(private http: HttpClient, private router: Router, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
 
-  
     if (typeof window !== 'undefined') {
       this.userId = localStorage.getItem('userId') || '';
     }
-
-    console.log("DASHBOARD USER ID:", this.userId);
 
     if (!this.userId) {
       this.router.navigate(['/login']);
@@ -41,18 +44,23 @@ export class Dashboard implements OnInit {
     }
 
     this.loadProfile();
-
   }
 
   loadProfile() {
     this.http.get(`http://localhost:3000/auth/profile?userId=${this.userId}`)
       .subscribe({
         next: (res: any) => {
-          console.log("DASH PROFILE:", res);
-          this.user = res;
+          this.user = { ...res };
+          this.cdr.detectChanges();
         },
         error: () => {
           this.error = 'Erro ao carregar o perfil do utilizador.';
+          this.cdr.detectChanges();
+
+          setTimeout(() => {
+            this.error = '';
+            this.cdr.detectChanges();
+          }, 2000);
         }
       });
   }
@@ -62,11 +70,24 @@ export class Dashboard implements OnInit {
       userId: this.userId
     }).subscribe({
       next: (res: any) => {
-        this.message = res.message;
+        this.message = res.message || 'Atualizado com sucesso';
+        this.cdr.detectChanges();
+
         this.loadProfile();
+
+        setTimeout(() => {
+          this.message = '';
+          this.cdr.detectChanges();
+        }, 2000);
       },
       error: (err: any) => {
         this.error = err.error?.message || 'Erro ao definir favorito';
+        this.cdr.detectChanges();
+
+        setTimeout(() => {
+          this.error = '';
+          this.cdr.detectChanges();
+        }, 2000);
       }
     });
   }
@@ -80,6 +101,7 @@ export class Dashboard implements OnInit {
     if (!term) {
       this.artists = [];
       this.error = 'Introduza um nome de artista.';
+      this.cdr.detectChanges();
       return;
     }
 
@@ -96,8 +118,6 @@ export class Dashboard implements OnInit {
         }
       });
   }
-
-
 
   logout() {
     if (typeof window !== 'undefined') {

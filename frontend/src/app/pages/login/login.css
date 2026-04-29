@@ -119,3 +119,28 @@
 .toggle:hover {
   opacity: 1;
 }
+.input-group {
+  position: relative;
+}
+
+.input-group input {
+  padding: 18px 14px 10px 14px;
+}
+
+.input-group label {
+  position: absolute;
+  left: 14px;
+  top: 16px;
+  color: #555;
+  font-size: 14px;
+  pointer-events: none;
+  transition: 0.2s;
+}
+
+/* quando escreve ou focus */
+.input-group input:focus + label,
+.input-group input:not(:placeholder-shown) + label {
+  top: 4px;
+  font-size: 11px;
+  color: var(--primary);
+}
