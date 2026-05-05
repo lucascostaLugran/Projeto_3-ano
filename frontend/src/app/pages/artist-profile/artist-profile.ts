@@ -19,6 +19,7 @@ export class ArtistProfile implements OnInit {
   userId = '';
   message = '';
   messageType = 'neutral';
+  showAll = false;
 
   user: any = {
     username: ''
@@ -99,5 +100,15 @@ export class ArtistProfile implements OnInit {
         }, 2000);
       }
     });
+  }
+
+  // ✅ AQUI FORA (CORRETO)
+  get visibleAlbums() {
+    return this.showAll ? this.albums : this.albums.slice(0, 3);
+  }
+
+  // ✅ AQUI FORA (CORRETO)
+  toggleShowAll() {
+    this.showAll = !this.showAll;
   }
 }
