@@ -4,6 +4,7 @@ import { Register } from './pages/register/register';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { Profile } from './pages/profile/profile';
 import { ArtistProfile } from './pages/artist-profile/artist-profile';
+import { AlbumProfile } from './pages/album-profile/album-profile';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -12,6 +13,7 @@ export const routes: Routes = [
   { path: 'profile', component: Profile },
 
   { path: 'artist/:id', component: ArtistProfile },
+  { path: 'album/:id', component: AlbumProfile }, 
 
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: '**', redirectTo: 'login' }

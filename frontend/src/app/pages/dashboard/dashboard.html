@@ -23,39 +23,34 @@
     <h1>Dashboard</h1>
 
     <div class="search-box">
+      <select [(ngModel)]="searchType" style="padding: 10px; border-radius: 10px; background: #cfd6e1; border:none; margin-right: 5px;">
+        <option value="artist">Artistas</option>
+        <option value="album">Álbuns</option>
+      </select>
 
       <div class="input-group">
-        <input type="text" placeholder=" " [(ngModel)]="searchTerm" />
-        <label>Pesquisar artistas...</label>
+        <input type="text" placeholder=" " [(ngModel)]="searchTerm" (keyup.enter)="search()" />
+        <label>Pesquisar {{ searchType === 'artist' ? 'artistas' : 'álbuns' }}...</label>
       </div>
 
-      <button type="button" (click)="search()">
-        Pesquisar
-      </button>
-
+      <button type="button" (click)="search()">Pesquisar</button>
     </div>
 
     <div class="results">
-
-
       <div *ngFor="let artist of artists" class="artist-card">
-
-        <h3 class="artist-name" [routerLink]="['/artist', artist._id]">
-          {{ artist.name }}
-        </h3>
-
-        <p class="artist-description">
-          {{ artist.description }}
-        </p>
-
-        <button class="fav-btn" (click)="addFavorite(artist._id)">
-          Favorito
-        </button>
-
+        <h3 class="artist-name" [routerLink]="['/artist', artist._id]">{{ artist.name }}</h3>
+        <p class="artist-description">{{ artist.description }}</p>
+        <button class="fav-btn" (click)="addFavorite(artist._id)">Favorito</button>
       </div>
-
-    </div>
-
+      
+      <div *ngFor="let album of albums" class="artist-card" [routerLink]="['/album', album._id]" style="cursor: pointer;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h3 class="artist-name">{{ album.title }}</h3>
+            <p class="artist-description">{{ album.artist?.name || 'Vários Artistas' }}</p>
+          </div>
+          <div style="color: #7f5af0; font-weight: bold;">{{ album.year }}</div>
+        </div>
+      </div>
   </div>
-
 </div>

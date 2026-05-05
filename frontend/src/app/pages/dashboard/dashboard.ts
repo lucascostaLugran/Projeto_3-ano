@@ -21,7 +21,9 @@ export class Dashboard implements OnInit {
   userId = '';
 
   searchTerm = '';
+  searchType: 'artist' | 'album' = 'artist';
   artists: any[] = [];
+  albums: any[] = [];
 
   message = '';
   error = '';
@@ -33,7 +35,6 @@ export class Dashboard implements OnInit {
   ) {}
 
   ngOnInit() {
-
     if (typeof window !== 'undefined') {
       this.userId = localStorage.getItem('userId') || '';
     }
@@ -100,23 +101,41 @@ export class Dashboard implements OnInit {
 
     if (!term) {
       this.artists = [];
-      this.error = 'Introduza um nome de artista.';
+      this.albums = [];
+      this.error = `Introduza um nome de ${this.searchType === 'artist' ? 'artista' : 'álbum'}.`;
       this.cdr.detectChanges();
       return;
     }
 
-    this.http.get(`http://localhost:3000/artists/search?name=${term}`)
-      .subscribe({
-        next: (res: any) => {
-          this.artists = res;
-          this.cdr.detectChanges();
-        },
-        error: (err: any) => {
-          this.artists = [];
-          this.error = err.error?.message || 'Nenhum artista encontrado.';
-          this.cdr.detectChanges();
-        }
-      });
+    if (this.searchType === 'artist') {
+      this.http.get(`http://localhost:3000/artists/search?name=${term}`)
+        .subscribe({
+          next: (res: any) => {
+            this.artists = res;
+            this.albums = [];
+            this.cdr.detectChanges();
+          },
+          error: (err: any) => {
+            this.artists = [];
+            this.error = err.error?.message || 'Nenhum artista encontrado.';
+            this.cdr.detectChanges();
+          }
+        });
+    } else {
+      this.http.get(`http://localhost:3000/albums/search?title=${term}`)
+        .subscribe({
+          next: (res: any) => {
+            this.albums = res;
+            this.artists = []; 
+            this.cdr.detectChanges();
+          },
+          error: (err: any) => {
+            this.albums = [];
+            this.error = err.error?.message || 'Nenhum álbum encontrado.';
+            this.cdr.detectChanges();
+          }
+        });
+    }
   }
 
   logout() {

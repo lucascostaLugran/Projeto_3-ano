@@ -1,12 +1,12 @@
 const express = require("express");
 const router = express.Router();
+const albumController = require('../controllers/albumController');
 
-const {
-  createAlbum,
-  createAlbumsBulk
-} = require("../controllers/albumController");
+router.get("/search", albumController.searchAlbums);
+router.get("/:id", albumController.getAlbumById);
 
-router.post("/", createAlbum);
-router.post("/bulk", createAlbumsBulk);
+
+router.post("/", albumController.createAlbum);
+router.post("/bulk", albumController.createAlbumsBulk);
 
 module.exports = router;
