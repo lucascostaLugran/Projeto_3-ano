@@ -34,6 +34,7 @@ export class ArtistProfile implements OnInit {
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
+  
 
     if (!id) return;
 
@@ -46,6 +47,7 @@ export class ArtistProfile implements OnInit {
         next: (res: any) => {
           this.artist = res.artist;
           this.albums = res.albums;
+          console.log("TOTAL REAL:", this.albums.length);
 
           this.cdr.detectChanges();
 
@@ -102,12 +104,12 @@ export class ArtistProfile implements OnInit {
     });
   }
 
-  // ✅ AQUI FORA (CORRETO)
+
   get visibleAlbums() {
     return this.showAll ? this.albums : this.albums.slice(0, 3);
   }
 
-  // ✅ AQUI FORA (CORRETO)
+
   toggleShowAll() {
     this.showAll = !this.showAll;
   }

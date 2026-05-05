@@ -27,10 +27,8 @@
 
         <div class="artist-row">
 
-          <!-- IMAGEM -->
           <img *ngIf="artist.imageUrl" [src]="artist.imageUrl" class="artist-image" alt="Artist image" />
 
-          <!-- TEXTO -->
           <div class="artist-meta">
 
             <div class="artist-top">
@@ -68,7 +66,6 @@
         </div>
       </div>
 
-      <!-- ✅ BOTÃO ADICIONADO -->
       <button 
         *ngIf="albums.length > 3" 
         class="show-more-btn" 

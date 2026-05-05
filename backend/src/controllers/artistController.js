@@ -229,7 +229,7 @@ exports.getArtistById = async (req, res) => {
 
     const albums = await Album.find({ artist: id })
       .sort({ year: -1 })
-      .limit(3);
+      .limit(5);
 
     res.json({
       artist,
