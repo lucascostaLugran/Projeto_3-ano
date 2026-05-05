@@ -1,5 +1,6 @@
 const Artist = require("../models/Artist");
 const Album = require("../models/Album");
+const { getArtistImage } = require("../services/spotifyService");
 
 
 exports.createArtist = async (req, res) => {
@@ -20,10 +21,19 @@ exports.createArtist = async (req, res) => {
       });
     }
 
+    let imageUrl = null;
+
+    try {
+      imageUrl = await getArtistImage(name);
+    } catch (err) {
+      console.log("Spotify fetch error:", err.message);
+    }
+
     const artist = new Artist({
       name,
       isni,
-      startYear
+      startYear,
+      imageUrl
     });
 
     await artist.save();
@@ -76,7 +86,24 @@ exports.createArtistsBulk = async (req, res) => {
       });
     }
 
-    const inserted = await Artist.insertMany(newArtists);
+    const artistsWithImages = [];
+
+    for (const artist of newArtists) {
+      let imageUrl = null;
+
+      try {
+        imageUrl = await getArtistImage(artist.name);
+      } catch (err) {
+        console.log("Spotify fetch error:", err.message);
+      }
+
+      artistsWithImages.push({
+        ...artist,
+        imageUrl
+      });
+    }
+
+    const inserted = await Artist.insertMany(artistsWithImages);
 
     res.status(201).json({
       message: `${inserted.length} artistas inseridos com sucesso`,
@@ -109,25 +136,43 @@ exports.updateArtistsBulk = async (req, res) => {
       }
     }
 
-    const operations = updates.map(item => {
+    const operations = [];
+
+    for (const item of updates) {
       const updateFields = {};
 
       if (item.name !== undefined) updateFields.name = item.name;
       if (item.startYear !== undefined) updateFields.startYear = item.startYear;
       if (item.description !== undefined) updateFields.description = item.description;
 
-      return {
+      // 🔥 BUSCAR NOME ATUAL (caso não venha no update)
+      const artist = await Artist.findById(item.id);
+      const artistName = item.name || artist?.name;
+
+      // 🔥 FETCH DA IMAGEM
+      let imageUrl = null;
+      try {
+        imageUrl = await getArtistImage(artistName);
+      } catch (err) {
+        console.log("Spotify fetch error:", err.message);
+      }
+
+      if (imageUrl) {
+        updateFields.imageUrl = imageUrl;
+      }
+
+      operations.push({
         updateOne: {
           filter: { _id: item.id },
           update: { $set: updateFields }
         }
-      };
-    });
+      });
+    }
 
     const result = await Artist.bulkWrite(operations);
 
     res.json({
-      message: "Artistas atualizados com sucesso",
+      message: "Artistas atualizados com imagem automaticamente",
       result
     });
 
@@ -183,8 +228,8 @@ exports.getArtistById = async (req, res) => {
     }
 
     const albums = await Album.find({ artist: id })
-    .sort({ year: -1 })
-    .limit(5);
+      .sort({ year: -1 })
+      .limit(5);
 
     res.json({
       artist,
@@ -196,7 +241,7 @@ exports.getArtistById = async (req, res) => {
     return res.status(500).json({
       message: "Erro no servidor"
     });
-    }
+  }
 };
 exports.getArtistAlbums = async (req, res) => {
   try {

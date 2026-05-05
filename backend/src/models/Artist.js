@@ -20,6 +20,10 @@ const artistSchema = new mongoose.Schema({
   description: {         
     type: String,
     default: ""
+  },
+  imageUrl: {
+    type: String,
+    default: ""
   }
 }, {
   timestamps: true

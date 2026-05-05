@@ -18,6 +18,7 @@ export class ArtistProfile implements OnInit {
   isFavorite = false;
   userId = '';
   message = '';
+  messageType = 'neutral';
 
   user: any = {
     username: ''
@@ -77,6 +78,7 @@ export class ArtistProfile implements OnInit {
         this.isFavorite = !this.isFavorite;
 
         this.message = res.message || 'Atualizado com sucesso';
+        this.messageType = 'neutral';
 
         this.cdr.detectChanges(); 
 
@@ -87,6 +89,7 @@ export class ArtistProfile implements OnInit {
       },
       error: (err: any) => {
         this.message = err.error?.message || 'Erro ao atualizar favorito';
+        this.messageType = 'error';
 
         this.cdr.detectChanges(); 
 

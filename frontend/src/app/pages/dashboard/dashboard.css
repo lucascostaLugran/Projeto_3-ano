@@ -31,7 +31,7 @@ body {
   flex-direction: column;
   gap: 15px;
   border-right: 1px solid #2a2a3a;
-  position: relative; 
+  position: relative;
 }
 
 .sidebar button {
@@ -95,7 +95,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start; 
+  justify-content: flex-start;
   padding: 40px 20px;
 }
 
@@ -178,9 +178,7 @@ body {
   opacity: 0.85;
 }
 
-.error {
-  color: red;
-}
+
 
 @media (max-width: 768px) {
   .dashboard {
@@ -197,7 +195,7 @@ body {
   }
 
   .logo {
-    height: 50px; 
+    height: 50px;
   }
 
   .main {
@@ -237,9 +235,41 @@ body {
   transition: 0.2s;
 }
 
-.input-group input:focus + label,
-.input-group input:not(:placeholder-shown) + label {
+.input-group input:focus+label,
+.input-group input:not(:placeholder-shown)+label {
   top: 4px;
   font-size: 11px;
   color: #7f5af0;
+}
+
+.toast-global {
+  position: fixed;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2d2d3a;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  z-index: 2000;
+  border: 1px solid #2a2a3a;
+  animation: slideDown 0.3s ease;
+}
+
+.toast-global.error {
+  background: #3a1f1f;
+  border: 1px solid #ff4d4d;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
 }

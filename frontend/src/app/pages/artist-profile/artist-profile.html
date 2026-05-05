@@ -8,10 +8,7 @@
     <button routerLink="/dashboard">🏠 Home</button>
 
     <div class="sidebar-bottom">
-      <button 
-        class="user-display" 
-        routerLink="/profile"
-      >
+      <button class="user-display" routerLink="/profile">
         👤 {{ user.username }}
       </button>
       <button (click)="logout()">⏻ Logout</button>
@@ -20,7 +17,7 @@
 
   <div class="main">
 
-    <div *ngIf="message" class="toast">
+    <div *ngIf="message" class="toast" [ngClass]="messageType">
       {{ message }}
     </div>
 
@@ -28,18 +25,30 @@
 
       <div class="artist-header">
 
-        <div class="artist-top">
-          <h1 class="artist-name">{{ artist.name }}</h1>
+        <div class="artist-row">
 
-          <button class="fav-btn" (click)="toggleFavorite()">
-            <span *ngIf="!isFavorite">🤍</span>
-            <span *ngIf="isFavorite">❤️</span>
-          </button>
-        </div>
+          <!-- IMAGEM -->
+          <img *ngIf="artist.imageUrl" [src]="artist.imageUrl" class="artist-image" alt="Artist image" />
 
-        <div class="artist-info">
-          <p><strong>ISNI:</strong> {{ artist.isni }}</p>
-          <p><strong>Ano de início:</strong> {{ artist.startYear }}</p>
+          <!-- TEXTO -->
+          <div class="artist-meta">
+
+            <div class="artist-top">
+              <h1 class="artist-name">{{ artist.name }}</h1>
+
+              <button class="fav-btn" (click)="toggleFavorite()">
+                <span *ngIf="!isFavorite">🤍</span>
+                <span *ngIf="isFavorite">❤️</span>
+              </button>
+            </div>
+
+            <div class="artist-info">
+              <p><strong>ISNI:</strong> {{ artist.isni }}</p>
+              <p><strong>Ano de início:</strong> {{ artist.startYear }}</p>
+            </div>
+
+          </div>
+
         </div>
 
       </div>

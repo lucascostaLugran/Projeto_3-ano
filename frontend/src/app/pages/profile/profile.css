@@ -172,6 +172,7 @@
   flex-direction: column;
   gap: 15px;
   animation: fadeIn 0.2s ease;
+  position : relative;
 }
 
 .modal input {
@@ -329,4 +330,50 @@
   background: #7f5af0;
   color: white;
   transform: translateY(-1px);
+}
+
+.toast {
+  position: absolute;
+  top: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2d2d3a;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  z-index: 1000;
+  border: 1px solid #2a2a3a;
+  white-space: nowrap;
+}
+
+.toast.error {
+  background: #3a1f1f;
+  border: 1px solid #ff4d4d;
+}
+
+.toast-global {
+  position: fixed;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2d2d3a;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  z-index: 2000;
+  border: 1px solid #2a2a3a;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
 }

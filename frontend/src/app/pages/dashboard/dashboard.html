@@ -7,10 +7,7 @@
     <button routerLink="/dashboard">🏠 Home</button>
 
     <div class="sidebar-bottom">
-      <button 
-        class="user-display" 
-        routerLink="/profile"
-      >
+      <button class="user-display" routerLink="/profile">
         👤 {{ user.username }}
       </button>
       <button (click)="logout()">⏻ Logout</button>
@@ -19,28 +16,27 @@
 
   <div class="main">
 
+    <div *ngIf="message || error" class="toast-global" [ngClass]="{ 'error': error }">
+      {{ error || message }}
+    </div>
+
     <h1>Dashboard</h1>
 
     <div class="search-box">
 
       <div class="input-group">
-        <input 
-          type="text"
-          placeholder=" "
-          [(ngModel)]="searchTerm"
-        />
+        <input type="text" placeholder=" " [(ngModel)]="searchTerm" />
         <label>Pesquisar artistas...</label>
       </div>
-    
+
       <button type="button" (click)="search()">
         Pesquisar
       </button>
-    
+
     </div>
 
     <div class="results">
 
-      <div *ngIf="error" class="error">{{ error }}</div>
 
       <div *ngFor="let artist of artists" class="artist-card">
 
