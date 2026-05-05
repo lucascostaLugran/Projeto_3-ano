@@ -17,8 +17,6 @@ export class Profile {
     username: ''
   };
 
-  userId = '';
-
   isEditing = false;
 
   editData: any = {
@@ -42,11 +40,11 @@ export class Profile {
   ) { }
 
   ngOnInit() {
-    if (typeof window !== 'undefined') {
-      this.userId = localStorage.getItem('userId') || '';
-    }
+    if (typeof window === 'undefined') return;
 
-    if (!this.userId) {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
       this.router.navigate(['/login']);
       return;
     }
@@ -55,22 +53,32 @@ export class Profile {
   }
 
   loadProfile() {
-    this.http.get(`http://localhost:3000/auth/profile?userId=${this.userId}`)
-      .subscribe({
-        next: (res: any) => {
-          this.user = { ...res };
-          this.cdr.detectChanges();
-        },
-        error: () => {
-          this.error = 'Erro ao carregar perfil';
-          this.cdr.detectChanges();
+    if (typeof window === 'undefined') return;
 
-          setTimeout(() => {
-            this.error = '';
-            this.cdr.detectChanges();
-          }, 2000);
-        }
-      });
+    const token = localStorage.getItem('token');
+
+    this.http.get(`http://localhost:3000/auth/profile`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    .subscribe({
+      next: (res: any) => {
+        this.user = { ...res };
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.log("PROFILE ERROR:", err);
+
+        this.error = 'Erro ao carregar perfil';
+        this.cdr.detectChanges();
+
+        setTimeout(() => {
+          this.error = '';
+          this.cdr.detectChanges();
+        }, 2000);
+      }
+    });
   }
 
   openEdit() {
@@ -89,81 +97,93 @@ export class Profile {
 
     this.error = '';
     this.message = '';
-  
+
     if (this.editData.password && this.editData.password !== this.editData.confirmPassword) {
       this.error = "As passwords não coincidem";
       this.cdr.detectChanges();
-  
+
       setTimeout(() => {
         this.error = '';
         this.cdr.detectChanges();
       }, 2000);
-  
+
       return;
     }
-  
+
     if (this.editData.birthDate) {
       const today = new Date();
       const birth = new Date(this.editData.birthDate);
-  
+
       let age = today.getFullYear() - birth.getFullYear();
       const m = today.getMonth() - birth.getMonth();
-  
+
       if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
         age--;
       }
-  
+
       if (age < 13) {
         this.error = "Tens de ter pelo menos 13 anos";
         this.cdr.detectChanges();
-  
+
         setTimeout(() => {
           this.error = '';
           this.cdr.detectChanges();
         }, 2000);
-  
+
         return;
       }
     }
-  
-    const body: any = {
-      userId: this.userId
-    };
-  
+
+    const body: any = {};
+
     if (this.editData.username) body.username = this.editData.username;
     if (this.editData.email) body.email = this.editData.email;
     if (this.editData.birthDate) body.birthDate = this.editData.birthDate;
     if (this.editData.password) body.password = this.editData.password;
-  
-    this.http.put('http://localhost:3000/auth/profile', body)
-      .subscribe({
-        next: () => {
-          this.message = 'Perfil atualizado com sucesso';
-          this.isEditing = false;
+
+    if (typeof window === 'undefined') return;
+
+    const token = localStorage.getItem('token');
+
+    this.http.put('http://localhost:3000/auth/profile', body, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    .subscribe({
+      next: () => {
+        this.message = 'Perfil atualizado com sucesso';
+        this.isEditing = false;
+        this.cdr.detectChanges();
+
+        this.loadProfile();
+
+        setTimeout(() => {
+          this.message = '';
           this.cdr.detectChanges();
-  
-          this.loadProfile();
-  
-          setTimeout(() => {
-            this.message = '';
-            this.cdr.detectChanges();
-          }, 2000);
-        },
-        error: (err: any) => {
-          this.error = err.error?.message || 'Erro ao atualizar perfil';
+        }, 2000);
+      },
+      error: (err: any) => {
+        this.error = err.error?.message || 'Erro ao atualizar perfil';
+        this.cdr.detectChanges();
+
+        setTimeout(() => {
+          this.error = '';
           this.cdr.detectChanges();
-  
-          setTimeout(() => {
-            this.error = '';
-            this.cdr.detectChanges();
-          }, 2000);
-        }
-      });
+        }, 2000);
+      }
+    });
   }
 
   removeFavorite() {
+    if (typeof window === 'undefined') return;
+
+    const token = localStorage.getItem('token');
+
     this.http.delete('http://localhost:3000/auth/favorite', {
-      body: { userId: this.userId }
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     }).subscribe({
       next: () => {
         this.user.favoriteArtist = null;
@@ -191,7 +211,7 @@ export class Profile {
 
   logout() {
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('userId');
+      localStorage.removeItem('token');
     }
     this.router.navigate(['/login']);
   }

@@ -130,6 +130,24 @@
   left: 0;
   z-index: 1000;
 }
+.artist-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #2a1f4f;
+  color: #a78bfa;
+  padding: 10px 16px;
+  border-radius: 20px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+  width: fit-content;
+}
+
+.artist-pill:hover {
+  background: #3b2a6f;
+  transform: scale(1.05);
+}
 
 .logo {
   height: 150px;

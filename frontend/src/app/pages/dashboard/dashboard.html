@@ -29,7 +29,12 @@
       </select>
 
       <div class="input-group">
-        <input type="text" placeholder=" " [(ngModel)]="searchTerm" (keyup.enter)="search()" />
+        <input 
+              type="text" 
+              placeholder=" " 
+              [(ngModel)]="searchTerm" 
+              (input)="onSearchChange()" 
+            />
         <label>Pesquisar {{ searchType === 'artist' ? 'artistas' : 'álbuns' }}...</label>
       </div>
 

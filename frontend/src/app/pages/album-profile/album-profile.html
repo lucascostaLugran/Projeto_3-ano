@@ -18,7 +18,19 @@
         <img [src]="album.imageUrl" class="album-cover-styled" alt="Capa do álbum">
         <div class="artist-meta">
           <h1 class="artist-name" style="font-size: 32px;">{{ album.title }}</h1>
-          <p class="subtitle">Artista: <strong style="color: #7f5af0;">{{ album.artist?.name || 'Vários Artistas' }}</strong></p>
+          <p class="subtitle">Artista</p>
+
+          <div 
+            class="artist-pill"
+            *ngIf="album.artist?._id"
+            [routerLink]="['/artist', album.artist._id]"
+          >
+            🎧 {{ album.artist.name }}
+          </div>
+          
+          <div *ngIf="!album.artist?._id">
+            Vários Artistas
+          </div>
           <p style="font-size: 12px; opacity: 0.5;">MBID: {{ album.mbid }}</p>
           <p>{{ album.year }} | {{ album.type | uppercase }}</p>
         </div>

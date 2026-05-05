@@ -16,6 +16,7 @@
   </div>
 
   <div class="main">
+    
 
     <div *ngIf="message" class="toast" [ngClass]="messageType">
       {{ message }}
@@ -51,10 +52,16 @@
 
       </div>
 
-      <h2 class="section-title">Álbuns recentes</h2>
+      <h2>
+        {{ showAll ? 'Todos os álbuns' : 'Álbuns recentes' }}
+      </h2>
 
       <div class="albums">
-        <div *ngFor="let album of visibleAlbums" class="album-card">
+        <div 
+            *ngFor="let album of visibleAlbums" 
+            class="album-card"
+            [routerLink]="['/album', album._id]"
+          >
 
           <div class="album-info">
             <p class="album-title">{{ album.title }}</p>

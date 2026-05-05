@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef } from '@angular/core';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 @Component({
   selector: 'app-dashboard',
@@ -24,6 +26,7 @@ export class Dashboard implements OnInit {
   searchType: 'artist' | 'album' = 'artist';
   artists: any[] = [];
   albums: any[] = [];
+  searchSubject = new Subject<string>();
 
   message = '';
   error = '';
@@ -45,6 +48,11 @@ export class Dashboard implements OnInit {
     }
 
     this.loadProfile();
+    this.searchSubject.pipe(
+      debounceTime(300)
+    ).subscribe(() => {
+      this.search();
+    });
   }
 
   loadProfile() {
@@ -136,6 +144,9 @@ export class Dashboard implements OnInit {
           }
         });
     }
+  }
+  onSearchChange() {
+    this.searchSubject.next(this.searchTerm);
   }
 
   logout() {

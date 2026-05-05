@@ -301,6 +301,15 @@
   pointer-events: none;
   transition: 0.2s;
 }
+.input-group span {
+  color: #7f5af0;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.input-group span:hover {
+  color: #a78bfa;
+}
 
 .input-group input:focus + label,
 .input-group input:not(:placeholder-shown) + label {

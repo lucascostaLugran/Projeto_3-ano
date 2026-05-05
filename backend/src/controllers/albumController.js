@@ -105,7 +105,7 @@ exports.searchAlbums = async (req, res) => {
       return res.status(400).json({ message: "O título é obrigatório para a pesquisa." });
     }
     const albums = await Album.find({ 
-      title: { $regex: title, $options: 'i' } 
+      title: { $regex: `^${title}`, $options: 'i' } 
     }).populate('artist', 'name'); 
 
     if (albums.length === 0) {

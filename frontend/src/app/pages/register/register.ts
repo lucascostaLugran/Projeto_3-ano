@@ -43,6 +43,11 @@ export class Register implements OnInit {
   onRegister() {
     this.message = '';
     this.error = '';
+    console.log("REGISTER USERNAME:", this.username);
+    console.log("REGISTER EMAIL:", this.email);
+    console.log("REGISTER PASSWORD:", this.password);
+    console.log("REGISTER BIRTHDATE:", this.birthDate);
+    
 
     const body = {
       username: this.username,
@@ -50,7 +55,8 @@ export class Register implements OnInit {
       password: this.password,
       birthDate: this.birthDate
     };
-
+    
+    console.log("REGISTER BODY:", body);
     this.http.post('http://localhost:3000/auth/register', body)
       .subscribe({
         next: () => {

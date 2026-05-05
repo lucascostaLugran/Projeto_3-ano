@@ -174,9 +174,9 @@
 }
 
 .artist-image {
-  width: 150px; /* Aumentei um pouco para a capa do álbum */
+  width: 150px; 
   height: 150px;
-  border-radius: 12px; /* Nas capas de álbuns usa-se 12px em vez de 50% para não ser círculo */
+  border-radius: 12px; 
   object-fit: cover;
   border: 2px solid var(--border);
 }
@@ -185,6 +185,19 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+.show-more-btn {
+  background: none;
+  border: none;
+  color: #a259ff;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.show-more-btn:hover {
+  text-decoration: underline;
+  color: #c084fc;
 }
 
 .toast {

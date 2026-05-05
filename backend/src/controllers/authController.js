@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 exports.register = async (req, res) => {
   try {
@@ -55,7 +56,8 @@ exports.register = async (req, res) => {
     });
 
     await user.save();
-
+    console.log("RAW:", birthDate);
+  console.log("PARSED:", new Date(birthDate));
     res.status(201).json({
       message: "Utilizador criado com sucesso"
     });
@@ -65,6 +67,7 @@ exports.register = async (req, res) => {
     res.status(500).json({ message: "Server error during registration" });
   }
 };
+
 
 exports.login = async (req, res) => {
   try {
@@ -84,13 +87,18 @@ exports.login = async (req, res) => {
       });
     }
 
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET || "secret123",
+      { expiresIn: "1d" }
+    );
+
     res.json({
       message: "Login efetuado com sucesso",
-      userId: user._id
+      token
     });
 
   } catch (error) {
-    console.error("Login error:", error);
     res.status(500).json({
       message: "Server error during login"
     });
@@ -101,7 +109,7 @@ exports.login = async (req, res) => {
 exports.getProfile = async (req, res) => {
 
   try {
-    const { userId } = req.query;
+    const userId = req.userId;
 
     const user = await User.findById(userId).populate("favoriteArtist");
 
@@ -126,7 +134,8 @@ exports.getProfile = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
   try {
-    const { userId, username, email, password, birthDate } = req.body;
+    const userId = req.userId;
+    const { username, email, password, birthDate } = req.body;
 
     const user = await User.findById(userId);
 
@@ -194,25 +203,17 @@ exports.updateProfile = async (req, res) => {
 
   } catch (error) {
     console.error("Update error:", error);
-
-    if (error.code === 11000) {
-      const field = Object.keys(error.keyValue)[0];
-      return res.status(400).json({
-        message: `${field} já está em uso`
-      });
-    }
-
     res.status(500).json({ message: "Erro no servidor" });
   }
 };
 
 exports.addFavoriteArtist = async (req, res) => {
   const artistId = req.params.id;
-  const { userId } = req.body;
+  const userId = req.userId;
 
-  if (!userId || !artistId) {
+  if (!artistId) {
     return res.status(400).json({
-      message: "UserId e artistId são obrigatórios"
+      message: "artistId é obrigatório"
     });
   }
 
@@ -224,12 +225,6 @@ exports.addFavoriteArtist = async (req, res) => {
     }
 
     if (user.favoriteArtist) {
-      if (user.favoriteArtist.toString() === artistId) {
-        return res.status(400).json({
-          message: "Este artista já é o teu favorito"
-        });
-      }
-
       return res.status(400).json({
         message: "Já tens um artista favorito"
       });
@@ -240,14 +235,13 @@ exports.addFavoriteArtist = async (req, res) => {
 
     res.json({ message: "Adicionado aos favoritos" });
 
-  } catch (err) {
+  } catch {
     res.status(500).json({ message: "Erro no servidor" });
   }
 };
-
 exports.removeFavoriteArtist = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const userId = req.userId;
 
     const user = await User.findById(userId);
 
@@ -264,10 +258,9 @@ exports.removeFavoriteArtist = async (req, res) => {
       message: "Favorito removido"
     });
 
-  } catch (error) {
+  } catch {
     res.status(500).json({
       message: "Erro no servidor"
     });
   }
 };
-

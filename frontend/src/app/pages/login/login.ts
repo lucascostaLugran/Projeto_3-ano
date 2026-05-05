@@ -40,6 +40,9 @@ export class Login {
 
   onLogin() {
     this.error = '';
+    console.log("USERNAME:", this.username);
+    console.log("PASSWORD:", this.password);
+
 
     this.http.post('http://localhost:3000/auth/login', {
       username: this.username,
@@ -48,11 +51,12 @@ export class Login {
     .subscribe({
       next: (res: any) => {
 
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('userId', res.userId);
-        }
+          localStorage.setItem('token', res.token);
 
-        this.router.navigate(['/dashboard']);
+
+          setTimeout(() => {
+            this.router.navigate(['/dashboard']);
+          }, 0);
       },
       error: (err: any) => {
 

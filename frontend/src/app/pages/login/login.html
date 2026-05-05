@@ -11,7 +11,7 @@
 
     <p class="success" *ngIf="message">{{ message }}</p>
 
-    <form (ngSubmit)="onLogin()">
+    <form (ngSubmit)="onLogin(); $event.preventDefault()">
 
       <div class="input-group">
         <input
@@ -36,7 +36,7 @@
         </span>
       </div>
 
-      <button type="submit">Entrar</button>
+      <button type="button" (click)="onLogin()">Entrar</button>
 
     </form>
 

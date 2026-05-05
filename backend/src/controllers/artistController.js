@@ -145,11 +145,9 @@ exports.updateArtistsBulk = async (req, res) => {
       if (item.startYear !== undefined) updateFields.startYear = item.startYear;
       if (item.description !== undefined) updateFields.description = item.description;
 
-      // 🔥 BUSCAR NOME ATUAL (caso não venha no update)
       const artist = await Artist.findById(item.id);
       const artistName = item.name || artist?.name;
 
-      // 🔥 FETCH DA IMAGEM
       let imageUrl = null;
       try {
         imageUrl = await getArtistImage(artistName);
