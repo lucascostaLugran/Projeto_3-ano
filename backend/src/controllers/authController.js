@@ -263,3 +263,63 @@ exports.removeFavoriteArtist = async (req, res) => {
     });
   }
 };
+
+exports.addToCollection = async (req, res) => {
+  try {
+    const { albumId, ean13 } = req.body;
+    const userId = req.userId;
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "Utilizador não encontrado" });
+
+    const exists = user.collection.find(item => item.ean13 === ean13);
+    if (exists) {
+      return res.status(400).json({ message: "A versão já existe na tua coleção" });
+    }
+
+    user.collection.push({ album: albumId, ean13 });
+    await user.save();
+
+    res.status(201).json({ message: "Álbum adicionado" });
+  } catch (error) {
+    res.status(500).json({ message: "Erro ao adicionar à coleção" });
+  }
+};
+
+exports.getCollection = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const user = await User.findById(userId).populate({
+      path: 'collection.album',
+      populate: { path: 'artist' }
+    });
+
+    if (!user) return res.status(404).json({ message: "Utilizador não encontrado" });
+
+    res.json(user.collection);
+  } catch (error) {
+    res.status(500).json({ message: "Erro ao obter coleção" });
+  }
+};
+
+exports.addToCollection = async (req, res) => {
+  try {
+    const { albumId, ean13 } = req.body;
+    const userId = req.userId;
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "Utilizador não encontrado" });
+
+    const alreadyInCollection = user.collection.find(item => item.ean13 === ean13);
+    if (alreadyInCollection) {
+      return res.status(400).json({ message: "Esta versão já está na tua coleção!" });
+    }
+
+    user.collection.push({ album: albumId, ean13 });
+    await user.save();
+
+    res.status(201).json({ message: "Adicionado à coleção com sucesso!" });
+  } catch (error) {
+    res.status(500).json({ message: "Erro no servidor ao adicionar à coleção" });
+  }
+};

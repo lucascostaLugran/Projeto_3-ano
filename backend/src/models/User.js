@@ -29,7 +29,13 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Artist',
     default: null
-  }
+  },
+
+  collection: [{
+    album: { type: mongoose.Schema.Types.ObjectId, ref: 'Album' },
+    ean13: { type: String, required: true },
+    addedAt: { type: Date, default: Date.now }
+  }]
 
 }, { timestamps: true });
 
