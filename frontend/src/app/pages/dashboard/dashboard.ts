@@ -12,7 +12,7 @@ import { debounceTime } from 'rxjs/operators';
   standalone: true,
   imports: [FormsModule, CommonModule, RouterModule],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.css'
+  styleUrls: ['./dashboard.css']
 })
 export class Dashboard implements OnInit {
 
@@ -29,6 +29,8 @@ export class Dashboard implements OnInit {
   message = '';
   error = '';
 
+  token: string = '';
+
   constructor(
     private http: HttpClient,
     private router: Router,
@@ -37,9 +39,11 @@ export class Dashboard implements OnInit {
 
   ngOnInit() {
 
-    const token = localStorage.getItem('token');
+    if (typeof window !== 'undefined') {
+      this.token = localStorage.getItem('token') || '';
+    }
 
-    if (!token) {
+    if (!this.token) {
       this.router.navigate(['/login']);
       return;
     }
@@ -55,7 +59,7 @@ export class Dashboard implements OnInit {
 
   getAuthHeaders() {
     return {
-      Authorization: `Bearer ${localStorage.getItem('token')}`
+      Authorization: `Bearer ${this.token}`
     };
   }
 
@@ -167,7 +171,9 @@ export class Dashboard implements OnInit {
   }
 
   logout() {
-    localStorage.removeItem('token');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('token');
+    }
     this.router.navigate(['/login']);
   }
 }

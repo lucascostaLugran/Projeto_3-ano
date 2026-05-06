@@ -77,7 +77,6 @@ async function getSpotifyArtist(artistName) {
   if (!artist) {
     return null;
   }
-
   return {
     spotifyId: artist.id,
     imageUrl: artist.images?.[0]?.url || "",
@@ -87,6 +86,7 @@ async function getSpotifyArtist(artistName) {
 
 
 async function getArtistAlbums(artistId) {
+  await new Promise(r => setTimeout(r, 500));
   const token = await getAccessToken();
 
   const albums = [];
@@ -98,6 +98,7 @@ async function getArtistAlbums(artistId) {
     });
 
     for (const album of albumsRes.data.items) {
+      await new Promise(r => setTimeout(r, 200));
       const detailsRes = await axios.get(
         `https://api.spotify.com/v1/albums/${album.id}`,
         { headers: { Authorization: `Bearer ${token}` } }

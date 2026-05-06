@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [FormsModule, CommonModule, RouterModule],
   templateUrl: './login.html',
-  styleUrl: './login.css'
+  styleUrls: ['./login.css']
 })
 export class Login {
 
@@ -27,7 +27,6 @@ export class Login {
   ) {}
 
   ngOnInit() {
-
     if (typeof window !== 'undefined') {
       const msg = localStorage.getItem("successMessage");
 
@@ -40,9 +39,6 @@ export class Login {
 
   onLogin() {
     this.error = '';
-    console.log("USERNAME:", this.username);
-    console.log("PASSWORD:", this.password);
-
 
     this.http.post('http://localhost:3000/auth/login', {
       username: this.username,
@@ -51,19 +47,17 @@ export class Login {
     .subscribe({
       next: (res: any) => {
 
+        if (typeof window !== 'undefined') {
           localStorage.setItem('token', res.token);
-          console.log("LOGIN SUCCESS:", res);
+        }
 
+        setTimeout(() => {
+          this.router.navigate(['/dashboard']);
+        }, 0);
 
-          setTimeout(() => {
-            this.router.navigate(['/dashboard']);
-          }, 0);
-
-          this.cdr.detectChanges();
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
-
-        console.log("LOGIN ERROR:", err);
 
         this.error =
           err.error?.message ||

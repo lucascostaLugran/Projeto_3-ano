@@ -16,6 +16,8 @@ const trackSchema = new mongoose.Schema({
     required: true
   }
 
+  
+
 }, { _id: false });
 
 const versionSchema = new mongoose.Schema({
@@ -60,12 +62,19 @@ const albumSchema = new mongoose.Schema({
     enum: ['album', 'single', 'compilation'],
     required: true
   },
+  
 
   artist: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Artist',
     required: true
   },
+  mbid: {
+    type: String,
+    default: ""
+  },
+
+  
 
   imageUrl: {
     type: String,

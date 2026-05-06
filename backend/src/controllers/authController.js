@@ -12,9 +12,7 @@ exports.register = async (req, res) => {
 
     const usernameRegex = /^[a-zA-Z0-9]+$/;
     if (!usernameRegex.test(username)) {
-      return res.status(400).json({
-        message: "Username só pode conter letras e números"
-      });
+      return res.status(400).json({ message: "Username só pode conter letras e números" });
     }
 
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
@@ -29,9 +27,7 @@ exports.register = async (req, res) => {
     let age = today.getFullYear() - birthDateObj.getFullYear();
     const m = today.getMonth() - birthDateObj.getMonth();
 
-    if (m < 0 || (m === 0 && today.getDate() < birthDateObj.getDate())) {
-      age--;
-    }
+    if (m < 0 || (m === 0 && today.getDate() < birthDateObj.getDate())) age--;
 
     if (age < 13) {
       return res.status(400).json({ message: "Deve ter pelo menos 13 anos" });
@@ -52,39 +48,30 @@ exports.register = async (req, res) => {
       email,
       password: hashedPass,
       birthDate,
-      favoriteArtist: null 
+      favoriteArtist: null
     });
 
     await user.save();
-    console.log("RAW:", birthDate);
-  console.log("PARSED:", new Date(birthDate));
-    res.status(201).json({
-      message: "Utilizador criado com sucesso"
-    });
 
-  } catch (error) {
-    console.error("Registration error:", error);
-    res.status(500).json({ message: "Server error during registration" });
+    res.status(201).json({ message: "Utilizador criado com sucesso" });
+
+  } catch {
+    res.status(500).json({ message: "Erro no servidor" });
   }
 };
-
 
 exports.login = async (req, res) => {
   try {
     const { username, password } = req.body;
 
     if (!username || !password) {
-      return res.status(400).json({
-        message: "Username e password são obrigatórios"
-      });
+      return res.status(400).json({ message: "Username e password são obrigatórios" });
     }
 
     const user = await User.findOne({ username });
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res.status(401).json({
-        message: "Credenciais inválidas"
-      });
+      return res.status(401).json({ message: "Credenciais inválidas" });
     }
 
     const token = jwt.sign(
@@ -93,24 +80,16 @@ exports.login = async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    res.json({
-      message: "Login efetuado com sucesso",
-      token
-    });
+    res.json({ message: "Login efetuado com sucesso", token });
 
-  } catch (error) {
-    res.status(500).json({
-      message: "Server error during login"
-    });
+  } catch {
+    res.status(500).json({ message: "Erro no servidor" });
   }
 };
 
 exports.getProfile = async (req, res) => {
-
   try {
-    const userId = req.userId;
-
-    const user = await User.findById(userId).populate("favoriteArtist");
+    const user = await User.findById(req.userId).populate("favoriteArtist");
 
     if (!user) {
       return res.status(404).json({ message: "User não encontrado" });
@@ -120,79 +99,31 @@ exports.getProfile = async (req, res) => {
       username: user.username,
       email: user.email,
       birthDate: user.birthDate,
-      favoriteArtist: user.favoriteArtist, 
+      favoriteArtist: user.favoriteArtist,
       description: user.description,
       avatar: user.avatar
     });
 
-  } catch (error) {
-    console.error("Profile error:", error);
+  } catch {
     res.status(500).json({ message: "Erro no servidor" });
   }
 };
 
 exports.updateProfile = async (req, res) => {
   try {
-    const userId = req.userId;
-    const { username, email, password, birthDate } = req.body;
-
-    const user = await User.findById(userId);
+    const user = await User.findById(req.userId);
 
     if (!user) {
       return res.status(404).json({ message: "User não encontrado" });
     }
 
-    const usernameRegex = /^[a-zA-Z0-9]+$/;
-    if (username && !usernameRegex.test(username)) {
-      return res.status(400).json({
-        message: "Username só pode conter letras e números"
-      });
-    }
+    const { username, email, password, birthDate } = req.body;
 
-    const emailRegex = /^\S+@\S+\.\S+$/;
-    if (email && !emailRegex.test(email)) {
-      return res.status(400).json({
-        message: "Email inválido"
-      });
-    }
-
-    if (username && username !== user.username) {
-      const existing = await User.findOne({ username });
-
-      if (existing && existing._id.toString() !== userId) {
-        return res.status(400).json({
-          message: "Username já existe"
-        });
-      }
-
-      user.username = username;
-    }
-
-    if (email && email !== user.email) {
-      const existing = await User.findOne({ email });
-
-      if (existing && existing._id.toString() !== userId) {
-        return res.status(400).json({
-          message: "Email já em uso"
-        });
-      }
-
-      user.email = email;
-    }
-
-    if (birthDate) {
-      user.birthDate = new Date(birthDate);
-    }
+    if (username) user.username = username;
+    if (email) user.email = email;
+    if (birthDate) user.birthDate = new Date(birthDate);
 
     if (password) {
-      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-
-      if (!passwordRegex.test(password)) {
-        return res.status(400).json({
-          message: "Password deve ter pelo menos 8 caracteres, uma maiúscula, uma minúscula e um número"
-        });
-      }
-
       user.password = await bcrypt.hash(password, 10);
     }
 
@@ -200,36 +131,22 @@ exports.updateProfile = async (req, res) => {
 
     res.json({ message: "Perfil atualizado com sucesso" });
 
-  } catch (error) {
-    console.error("Update error:", error);
+  } catch {
     res.status(500).json({ message: "Erro no servidor" });
   }
 };
 
 exports.addFavoriteArtist = async (req, res) => {
-  const artistId = req.params.id;
-  const userId = req.userId;
-
-  if (!artistId) {
-    return res.status(400).json({
-      message: "artistId é obrigatório"
-    });
-  }
-
   try {
-    const user = await User.findById(userId);
+    const user = await User.findById(req.userId);
 
-    if (!user) {
-      return res.status(404).json({ message: "User não encontrado" });
-    }
+    if (!user) return res.status(404).json({ message: "User não encontrado" });
 
     if (user.favoriteArtist) {
-      return res.status(400).json({
-        message: "Já tens um artista favorito"
-      });
+      return res.status(400).json({ message: "Já tens um artista favorito" });
     }
 
-    user.favoriteArtist = artistId;
+    user.favoriteArtist = req.params.id;
     await user.save();
 
     res.json({ message: "Adicionado aos favoritos" });
@@ -238,88 +155,119 @@ exports.addFavoriteArtist = async (req, res) => {
     res.status(500).json({ message: "Erro no servidor" });
   }
 };
+
 exports.removeFavoriteArtist = async (req, res) => {
   try {
-    const userId = req.userId;
-
-    const user = await User.findById(userId);
+    const user = await User.findById(req.userId);
 
     if (!user || !user.favoriteArtist) {
-      return res.status(400).json({
-        message: "Não tens artista favorito"
-      });
+      return res.status(400).json({ message: "Não tens artista favorito" });
     }
 
     user.favoriteArtist = null;
     await user.save();
 
-    res.json({
-      message: "Favorito removido"
-    });
+    res.json({ message: "Favorito removido" });
 
   } catch {
-    res.status(500).json({
-      message: "Erro no servidor"
-    });
+    res.status(500).json({ message: "Erro no servidor" });
   }
 };
 
 exports.addToCollection = async (req, res) => {
   try {
     const { albumId, ean13 } = req.body;
-    const userId = req.userId;
 
-    const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ message: "Utilizador não encontrado" });
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ message: "Utilizador não encontrado" });
+    }
 
-    const exists = user.collection.find(item => item.ean13 === ean13);
-    if (exists) {
-      return res.status(400).json({ message: "A versão já existe na tua coleção" });
+    const alreadyInCollection = user.collection.find(
+      item => item.album.toString() === albumId
+    );
+
+    if (alreadyInCollection) {
+      return res.status(400).json({
+        message: "Já tens uma versão deste álbum na tua coleção!"
+      });
     }
 
     user.collection.push({ album: albumId, ean13 });
+
     await user.save();
 
-    res.status(201).json({ message: "Álbum adicionado" });
+    res.status(201).json({
+      message: "Adicionado à coleção com sucesso!"
+    });
+
   } catch (error) {
-    res.status(500).json({ message: "Erro ao adicionar à coleção" });
+    console.error(error);
+    res.status(500).json({ message: "Erro no servidor" });
   }
 };
 
 exports.getCollection = async (req, res) => {
   try {
-    const userId = req.userId;
-    const user = await User.findById(userId).populate({
-      path: 'collection.album',
-      populate: { path: 'artist' }
-    });
+    const user = await User.findById(req.userId)
+      .populate({
+        path: "collection.album",
+        populate: {
+          path: "artist",
+          select: "name"
+        }
+      });
 
-    if (!user) return res.status(404).json({ message: "Utilizador não encontrado" });
-
-    res.json(user.collection);
-  } catch (error) {
-    res.status(500).json({ message: "Erro ao obter coleção" });
-  }
-};
-
-exports.addToCollection = async (req, res) => {
-  try {
-    const { albumId, ean13 } = req.body;
-    const userId = req.userId;
-
-    const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ message: "Utilizador não encontrado" });
-
-    const alreadyInCollection = user.collection.find(item => item.ean13 === ean13);
-    if (alreadyInCollection) {
-      return res.status(400).json({ message: "Esta versão já está na tua coleção!" });
+    if (!user) {
+      return res.status(404).json({ message: "Utilizador não encontrado" });
     }
 
-    user.collection.push({ album: albumId, ean13 });
+    const collection = user.collection.map(item => {
+      const album = item.album;
+
+      const version = album?.versions?.find(v => v.ean13 === item.ean13);
+
+      return {
+        albumId: album?._id,
+        title: album?.title,
+        year: album?.year,
+        artist: album?.artist?.name || 'Vários Artistas',
+
+        ean13: item.ean13,
+        format: version?.format || 'N/A',
+        description: version?.description || '',
+
+        addedAt: item.addedAt
+      };
+    });
+
+    res.json(collection);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erro ao buscar coleção" });
+  }
+};
+exports.removeFromCollection = async (req, res) => {
+  try {
+    const { albumId, ean13 } = req.body;
+
+    const user = await User.findById(req.userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "Utilizador não encontrado" });
+    }
+
+    user.collection = user.collection.filter(
+      item => !(item.album.toString() === albumId && item.ean13 === ean13)
+    );
+
     await user.save();
 
-    res.status(201).json({ message: "Adicionado à coleção com sucesso!" });
-  } catch (error) {
-    res.status(500).json({ message: "Erro no servidor ao adicionar à coleção" });
+    res.json({ message: "Removido da coleção com sucesso!" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Erro ao remover da coleção" });
   }
 };

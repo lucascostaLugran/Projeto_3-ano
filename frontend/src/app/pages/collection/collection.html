@@ -1,0 +1,100 @@
+<div class="dashboard">
+
+  
+    <div class="sidebar">
+  <div class="logo-container">
+    <img src="/assets/logo.png" class="logo" />
+  </div>
+  
+  <button routerLink="/dashboard">🏠 Home</button>
+  <button routerLink="/collection">📚 Coleção</button>
+  
+  <div class="sidebar-bottom">
+    <button class="user-display" routerLink="/profile">
+      👤 {{ user.username }}
+    </button>
+    <button (click)="logout()">⏻ Logout</button>
+  </div>
+
+  
+    </div>
+  
+    <div class="main">
+  <div *ngIf="message || error" class="toast-global" [ngClass]="{ 'error': error }">
+    {{ error || message }}
+  </div>
+  
+  <h1>📚 A Minha Coleção</h1>
+  <div class="search-box">
+  
+    <select [(ngModel)]="sortField" (change)="sortCollection()">
+      <option value="title">Título</option>
+      <option value="artist">Artista</option>
+      <option value="year">Ano</option>
+      <option value="format">Formato</option>
+      <option value="addedAt">Data</option>
+    </select>
+  
+    <button (click)="toggleSort()">Ordenar</button>
+  
+  </div>
+  
+  <div class="results">
+  
+    <div *ngFor="let item of collection" class="artist-card">
+  
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+
+        <div>
+  
+          <h3 
+            class="artist-name"
+            (click)="goToAlbum(item.albumId)"
+          >
+            {{ item.title }}
+          </h3>
+  
+          <p class="artist-description">
+            {{ item.artist }}
+          </p>
+  
+          <p style="font-size:13px; color:#888;">
+            {{ item.year }} • {{ item.format }}
+          </p>
+  
+          <p style="font-size:11px; color:#666;">
+            {{ item.addedAt | date:'short' }}
+          </p>
+  
+        </div>
+  
+        <div style="text-align:right;">
+  
+          <div style="color:#7f5af0; font-size:12px; margin-bottom:10px;">
+            {{ item.ean13 }}
+          </div>
+  
+          <button 
+            class="fav-btn"
+            style="background:#ff4d4d;"
+            (click)="removeFromCollection(item); $event.stopPropagation()"
+          >
+            🗑
+          </button>
+  
+        </div>
+  
+      </div>
+  
+    </div>
+  
+  </div>
+  
+  <div *ngIf="collection.length === 0" style="margin-top:40px; color:#888;">
+    Ainda não tens nada na coleção
+  </div>
+  
+    </div>
+  
+  </div>
+  

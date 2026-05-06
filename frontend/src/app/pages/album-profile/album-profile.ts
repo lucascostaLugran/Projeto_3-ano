@@ -8,58 +8,133 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './album-profile.html',
-  styleUrl: './album-profile.css'
+  styleUrls: ['./album-profile.css']
 })
 export class AlbumProfile implements OnInit {
+
   private http = inject(HttpClient);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
 
   album: any = null;
-  userId: string = '';
   user: any = { username: '' };
 
-ngOnInit() {
-  const token = localStorage.getItem('token');
+  collection: any[] = [];
 
-  if (!token) {
-    this.router.navigate(['/login']);
-    return;
+  message = '';
+  messageType = 'neutral';
+
+  token: string = ''; 
+
+  ngOnInit() {
+    if (typeof window !== 'undefined') {
+      this.token = localStorage.getItem('token') || '';
+    }
+
+    if (!this.token) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    this.loadUserProfile();
+    this.loadCollection(); 
+
+    const id = this.route.snapshot.paramMap.get('id');
+
+    if (id) {
+      this.http.get(`http://localhost:3000/albums/${id}`).subscribe({
+        next: (res) => {
+          this.album = res;
+          this.cdr.detectChanges();
+        },
+        error: (err) => console.error('Erro ao carregar álbum:', err)
+      });
+    }
   }
-
-  if (typeof window !== 'undefined') {
-    this.userId = localStorage.getItem('userId') || '';
-  }
-
-  this.loadUserProfile();
-
-  const id = this.route.snapshot.paramMap.get('id');
-
-  if (id) {
-    this.http.get(`http://localhost:3000/albums/${id}`).subscribe({
-      next: (res) => {
-        this.album = res;
-        this.cdr.detectChanges();
-      },
-      error: (err) => console.error('Erro ao carregar álbum:', err)
-    });
-  }
-}
 
   loadUserProfile() {
-    this.http.get(`http://localhost:3000/auth/profile?userId=${this.userId}`)
-      .subscribe({
-        next: (res: any) => {
-          this.user = res;
-          this.cdr.detectChanges();
+    this.http.get(`http://localhost:3000/auth/profile`, {
+      headers: {
+        Authorization: `Bearer ${this.token}` 
+      }
+    }).subscribe({
+      next: (res: any) => {
+        this.user = res;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  loadCollection() {
+    this.http.get('http://localhost:3000/albums/collection', {
+      headers: {
+        Authorization: `Bearer ${this.token}`
+      }
+    }).subscribe({
+      next: (res: any) => {
+        this.collection = res;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  // ✅ FALTAVA ISTO
+  isInCollection(ean13: string): boolean {
+    return this.collection.some(item => item.ean13 === ean13);
+  }
+
+  formatDuration(seconds: number): string {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  }
+
+  addToCollection(ean13: string) {
+    if (!this.token || !this.album) return;
+  
+    this.http.post(
+      'http://localhost:3000/albums/collection',
+      {
+        albumId: this.album._id,
+        ean13: ean13
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${this.token}`
         }
-      });
+      }
+    ).subscribe({
+      next: (res: any) => {
+        this.message = res.message || 'Adicionado à coleção!';
+        this.messageType = 'neutral';
+
+        this.loadCollection();
+
+        this.cdr.detectChanges();
+  
+        setTimeout(() => {
+          this.message = '';
+          this.cdr.detectChanges();
+        }, 2000);
+      },
+      error: (err: any) => {
+        this.message = err.error?.message || 'Erro ao adicionar';
+        this.messageType = 'error';
+  
+        this.cdr.detectChanges();
+  
+        setTimeout(() => {
+          this.message = '';
+          this.cdr.detectChanges();
+        }, 2000);
+      }
+    });
   }
 
   logout() {
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('userId');
+      localStorage.removeItem('token'); 
     }
     this.router.navigate(['/login']);
   }

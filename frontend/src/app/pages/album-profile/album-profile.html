@@ -1,5 +1,6 @@
 <div class="dashboard">
 
+
   <div class="sidebar">
 
     <div class="logo-container">
@@ -7,6 +8,7 @@
     </div>
 
     <button routerLink="/dashboard">🏠 Home</button>
+    <button routerLink="/collection">📚 Coleção</button>
 
     <div class="sidebar-bottom">
       <button class="user-display" routerLink="/profile">
@@ -16,8 +18,11 @@
       <button (click)="logout()">⏻ Logout</button>
     </div>
   </div>
-
   <div class="main" *ngIf="album">
+
+    <div *ngIf="message" class="toast" [ngClass]="messageType">
+      {{ message }}
+    </div>
 
     <div class="artist-container">
 
@@ -61,6 +66,7 @@
 
       </div>
 
+  
       <h2 class="section-title">
         Faixas
       </h2>
@@ -71,15 +77,13 @@
           *ngFor="let track of album.tracks"
           class="album-card"
         >
-
           <span>
             {{ track.number }}. {{ track.title }}
           </span>
 
           <span class="track-duration">
-            {{ track.duration }}s
+            {{ formatDuration(track.duration) }}
           </span>
-
         </div>
 
       </div>
@@ -90,25 +94,34 @@
 
       <div class="albums">
 
-        <div
-          *ngFor="let v of album.versions"
-          class="album-card"
-        >
+        <div *ngFor="let v of album.versions" class="album-card">
 
-          <div>
+          <div class="version-left">
+        
             <strong class="version-format">
+              {{ v.format === 'CD' ? '💿' : v.format === 'Vinyl' ? '📀' : '📼' }}
               {{ v.format | uppercase }}
             </strong>
-
-            <div class="version-description">
+        
+            <button
+            class="add-icon-btn"
+            (click)="addToCollection(v.ean13)"
+            [disabled]="isInCollection(v.ean13)"
+            [ngClass]="{ 'disabled-btn': isInCollection(v.ean13) }"
+          >
+            {{ isInCollection(v.ean13) ? '✓' : '+' }}
+          </button>
+        
+            <div class="version-description" *ngIf="v.description">
               {{ v.description }}
             </div>
+        
           </div>
-
+        
           <code class="ean-code">
             {{ v.ean13 }}
           </code>
-
+        
         </div>
 
       </div>

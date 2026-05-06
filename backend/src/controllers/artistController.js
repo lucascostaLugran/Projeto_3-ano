@@ -7,7 +7,7 @@ const {
 
 exports.createArtist = async (req, res) => {
   try {
-    const { name, isni, startYear } = req.body;
+    const { name, isni, startYear, description } = req.body;
 
     if (!name || !isni || !startYear) {
       return res.status(400).json({ message: "Todos os campos são obrigatórios" });
@@ -31,7 +31,7 @@ exports.createArtist = async (req, res) => {
       console.log("Spotify fetch error:", err.message);
     }
 
-    const artist = new Artist({ name, isni, startYear, imageUrl, spotifyId });
+    const artist = new Artist({ name, isni, startYear, description, imageUrl, spotifyId });
     await artist.save();
 
     if (spotifyId) {
@@ -39,16 +39,46 @@ exports.createArtist = async (req, res) => {
         console.log("A buscar álbuns para spotifyId:", spotifyId);
         const spotifyAlbums = await getArtistAlbums(spotifyId); 
         console.log("Álbuns encontrados:", spotifyAlbums.length);
+        const allVersions = [
+          { format: "CD", description: "" },
+          { format: "CD", description: "Deluxe" },
+          { format: "Vinyl", description: "180g" },
+          { format: "Vinyl", description: "Deluxe Edition" },
+          { format: "Vinyl", description: "Remastered" },
+          { format: "Cassette", description: "Limited Edition" }
+        ];
+        
+        const generateEAN = () =>
+          Math.floor(Math.random() * 1e13).toString().padStart(13, "0");
+        
+        const shuffle = (array) => array.sort(() => Math.random() - 0.5);
 
-        const albumsToInsert = spotifyAlbums.map(album => ({
-          spotifyId: album.spotifyId,
-          title: album.title,
-          year: album.year,
-          type: album.type,   
-          imageUrl: album.imageUrl,
-          tracks: album.tracks,
-          artist: artist._id
-        }));
+        const albumsToInsert = spotifyAlbums.map(album => {
+
+
+          const shuffled = shuffle([...allVersions]);
+          const numVersions = Math.floor(Math.random() * 4) + 1;
+        
+          const selected = shuffled.slice(0, numVersions);
+
+          const versions = selected.map(v => ({
+            ean13: generateEAN(),
+            format: v.format,
+            description: v.description
+          }));
+        
+          return {
+            spotifyId: album.spotifyId,
+            mbid: album.spotifyId,
+            title: album.title,
+            year: album.year,
+            type: album.type,
+            imageUrl: album.imageUrl,
+            tracks: album.tracks,
+            artist: artist._id,
+            versions 
+          };
+        });
 
         if (albumsToInsert.length > 0) {
           await Album.insertMany(albumsToInsert, { ordered: false });
@@ -124,7 +154,7 @@ exports.createArtistsBulk = async (req, res) => {
 
       if (spotifyId) {
 
-        const spotifyAlbums = await getArtistAlbums(item.name);
+        const spotifyAlbums = await getArtistAlbums(spotifyId);
 
         const albumsToInsert = spotifyAlbums.map(album => ({
           spotifyId: album.spotifyId,
@@ -271,8 +301,7 @@ exports.getArtistById = async (req, res) => {
     }
 
     const albums = await Album.find({ artist: id })
-      .sort({ year: -1 })
-      .limit(5);
+      .sort({ year: -1 });
 
     res.json({
       artist,
