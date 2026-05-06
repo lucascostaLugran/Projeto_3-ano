@@ -1,34 +1,41 @@
 .logo-container {
   position: absolute;
-  top: 0;
+  top: 20px;
   left: 0;
-  z-index: 10;
+  width: 120%;
+  display: flex;
+  justify-content: center;
+  z-index: 1;
   pointer-events: none;
 }
 
 .logo {
-  height: clamp(180px, 14vw, 260px);
-  transform: translate(-20%, -10%);
+  width: 260px;
+  height: auto;
+  margin-left: -45px;
+  margin-top: -40px;
 }
 
 .dashboard {
   display: flex;
-  min-height: 100vh;
   background: #0f0e17;
   color: white;
-  position: relative;
 }
 
 .sidebar {
   width: 220px;
-  min-width: 200px;
+  min-width: 220px;
+  height: 100vh;
   background: #16161f;
-  padding: 155px 20px 30px 20px;
+  padding: 120px 20px 30px 20px;
   display: flex;
   flex-direction: column;
   gap: 15px;
   border-right: 1px solid #2a2a3a;
-  position: relative;
+  position: sticky;
+  top: 0;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .sidebar button {
@@ -92,6 +99,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 40px 20px;
 }
 
 .profile-card {
@@ -172,7 +180,7 @@
   flex-direction: column;
   gap: 15px;
   animation: fadeIn 0.2s ease;
-  position : relative;
+  position: relative;
 }
 
 .modal input {
@@ -242,9 +250,13 @@
 
   .sidebar {
     width: 100%;
+    min-width: unset;
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
     padding: 10px 15px;
+    height: auto;
+    position: relative;
   }
 
   .main {
@@ -254,7 +266,8 @@
 
   .logo {
     height: 50px;
-    transform: none;
+    width: auto;
+    margin: 0;
   }
 }
 
@@ -301,6 +314,7 @@
   pointer-events: none;
   transition: 0.2s;
 }
+
 .input-group span {
   color: #7f5af0;
   cursor: pointer;
@@ -317,21 +331,18 @@
   font-size: 11px;
   color: #7f5af0;
 }
+
 .artist-link {
   display: inline-block;
   margin-top: 6px;
   padding: 6px 12px;
   border-radius: 999px;
-
   background: rgba(127, 90, 240, 0.15);
   color: #7f5af0;
-
   font-size: 14px;
   font-weight: 500;
-
   cursor: pointer;
   transition: 0.2s ease;
-
   width: fit-content;
 }
 
@@ -381,6 +392,7 @@
     opacity: 0;
     transform: translate(-50%, -20px);
   }
+
   to {
     opacity: 1;
     transform: translate(-50%, 0);

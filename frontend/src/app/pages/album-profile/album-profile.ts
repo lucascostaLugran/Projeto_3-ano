@@ -20,29 +20,32 @@ export class AlbumProfile implements OnInit {
   userId: string = '';
   user: any = { username: '' };
 
-  ngOnInit() {
-    if (typeof window !== 'undefined') {
-      this.userId = localStorage.getItem('userId') || '';
-    }
+ngOnInit() {
+  const token = localStorage.getItem('token');
 
-    if (!this.userId) {
-      this.router.navigate(['/login']);
-      return;
-    }
-
-    this.loadUserProfile();
-
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.http.get(`http://localhost:3000/albums/${id}`).subscribe({
-        next: (res) => {
-          this.album = res;
-          this.cdr.detectChanges();
-        },
-        error: (err) => console.error('Erro ao carregar álbum:', err)
-      });
-    }
+  if (!token) {
+    this.router.navigate(['/login']);
+    return;
   }
+
+  if (typeof window !== 'undefined') {
+    this.userId = localStorage.getItem('userId') || '';
+  }
+
+  this.loadUserProfile();
+
+  const id = this.route.snapshot.paramMap.get('id');
+
+  if (id) {
+    this.http.get(`http://localhost:3000/albums/${id}`).subscribe({
+      next: (res) => {
+        this.album = res;
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Erro ao carregar álbum:', err)
+    });
+  }
+}
 
   loadUserProfile() {
     this.http.get(`http://localhost:3000/auth/profile?userId=${this.userId}`)

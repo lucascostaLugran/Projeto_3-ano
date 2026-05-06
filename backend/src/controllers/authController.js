@@ -105,7 +105,6 @@ exports.login = async (req, res) => {
   }
 };
 
-/* ================= PROFILE ================= */
 exports.getProfile = async (req, res) => {
 
   try {

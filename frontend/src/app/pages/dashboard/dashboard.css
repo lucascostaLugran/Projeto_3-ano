@@ -1,37 +1,42 @@
 .logo-container {
   position: absolute;
-  top: 0px;
-  left: 0px;
-  z-index: 1000;
+  top: 20px;
+  left: 0;
+  width: 120%;
+  display: flex;
+  justify-content: center;
+  z-index: 1;
   pointer-events: none;
 }
 
 .logo {
-  height: clamp(180px, 14vw, 260px);
-  transform: translate(-20%, -10%);
+  width: 260px;
+  height: auto;
+  margin-left: -45px;
+  margin-top: -40px;
 }
 
-body {
-  overflow: hidden;
-}
 
 .dashboard {
   display: flex;
-  min-height: 100vh;
   background: #0f0e17;
   color: white;
 }
 
 .sidebar {
   width: 220px;
-  min-width: 200px;
+  min-width: 220px;
+  height: 100vh;
   background: #16161f;
-  padding: 155px 20px 30px 20px;
+  padding: 120px 20px 30px 20px;
   display: flex;
   flex-direction: column;
   gap: 15px;
   border-right: 1px solid #2a2a3a;
-  position: relative;
+  position: sticky;
+  top: 0;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .sidebar button {
@@ -97,6 +102,7 @@ body {
   align-items: center;
   justify-content: flex-start;
   padding: 40px 20px;
+  overflow-y: auto;
 }
 
 .search-box {

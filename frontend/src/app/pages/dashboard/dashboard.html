@@ -1,9 +1,9 @@
-<div class="logo-container">
-  <img src="/assets/logo.png" class="logo" alt="Sonexa logo" />
-</div>
-
 <div class="dashboard">
   <div class="sidebar">
+
+    <div class="logo-container">
+      <img src="/assets/logo.png" class="logo" alt="Sonexa logo" />
+    </div>
     <button routerLink="/dashboard">🏠 Home</button>
 
     <div class="sidebar-bottom">
@@ -23,18 +23,14 @@
     <h1>Dashboard</h1>
 
     <div class="search-box">
-      <select [(ngModel)]="searchType" style="padding: 10px; border-radius: 10px; background: #cfd6e1; border:none; margin-right: 5px;">
+      <select [(ngModel)]="searchType"
+        style="padding: 10px; border-radius: 10px; background: #cfd6e1; border:none; margin-right: 5px;">
         <option value="artist">Artistas</option>
         <option value="album">Álbuns</option>
       </select>
 
       <div class="input-group">
-        <input 
-              type="text" 
-              placeholder=" " 
-              [(ngModel)]="searchTerm" 
-              (input)="onSearchChange()" 
-            />
+        <input type="text" placeholder=" " [(ngModel)]="searchTerm" (input)="onSearchChange()" />
         <label>Pesquisar {{ searchType === 'artist' ? 'artistas' : 'álbuns' }}...</label>
       </div>
 
@@ -47,8 +43,9 @@
         <p class="artist-description">{{ artist.description }}</p>
         <button class="fav-btn" (click)="addFavorite(artist._id)">Favorito</button>
       </div>
-      
-      <div *ngFor="let album of albums" class="artist-card" [routerLink]="['/album', album._id]" style="cursor: pointer;">
+
+      <div *ngFor="let album of albums" class="artist-card" [routerLink]="['/album', album._id]"
+        style="cursor: pointer;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <div>
             <h3 class="artist-name">{{ album.title }}</h3>
@@ -57,5 +54,5 @@
           <div style="color: #7f5af0; font-weight: bold;">{{ album.year }}</div>
         </div>
       </div>
+    </div>
   </div>
-</div>

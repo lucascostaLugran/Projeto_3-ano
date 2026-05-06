@@ -20,8 +20,6 @@ export class Dashboard implements OnInit {
     username: ''
   };
 
-  userId = '';
-
   searchTerm = '';
   searchType: 'artist' | 'album' = 'artist';
   artists: any[] = [];
@@ -38,16 +36,16 @@ export class Dashboard implements OnInit {
   ) {}
 
   ngOnInit() {
-    if (typeof window !== 'undefined') {
-      this.userId = localStorage.getItem('userId') || '';
-    }
 
-    if (!this.userId) {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
       this.router.navigate(['/login']);
       return;
     }
 
     this.loadProfile();
+
     this.searchSubject.pipe(
       debounceTime(300)
     ).subscribe(() => {
@@ -55,29 +53,44 @@ export class Dashboard implements OnInit {
     });
   }
 
-  loadProfile() {
-    this.http.get(`http://localhost:3000/auth/profile?userId=${this.userId}`)
-      .subscribe({
-        next: (res: any) => {
-          this.user = { ...res };
-          this.cdr.detectChanges();
-        },
-        error: () => {
-          this.error = 'Erro ao carregar o perfil do utilizador.';
-          this.cdr.detectChanges();
+  getAuthHeaders() {
+    return {
+      Authorization: `Bearer ${localStorage.getItem('token')}`
+    };
+  }
 
-          setTimeout(() => {
-            this.error = '';
-            this.cdr.detectChanges();
-          }, 2000);
-        }
-      });
+  loadProfile() {
+    this.http.get('http://localhost:3000/auth/profile', {
+      headers: this.getAuthHeaders()
+    })
+    .subscribe({
+      next: (res: any) => {
+        this.user = { ...res };
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.error = 'Erro ao carregar o perfil do utilizador.';
+        this.cdr.detectChanges();
+
+        setTimeout(() => {
+          this.error = '';
+          this.cdr.detectChanges();
+        }, 2000);
+      }
+    });
   }
 
   addFavorite(artistId: string) {
-    this.http.post(`http://localhost:3000/artists/${artistId}/favorite`, {
-      userId: this.userId
-    }).subscribe({
+    this.message = '';
+    this.error = '';
+
+    this.http.post(
+      `http://localhost:3000/artists/${artistId}/favorite`,
+      {},
+      {
+        headers: this.getAuthHeaders()
+      }
+    ).subscribe({
       next: (res: any) => {
         this.message = res.message || 'Atualizado com sucesso';
         this.cdr.detectChanges();
@@ -116,6 +129,7 @@ export class Dashboard implements OnInit {
     }
 
     if (this.searchType === 'artist') {
+
       this.http.get(`http://localhost:3000/artists/search?name=${term}`)
         .subscribe({
           next: (res: any) => {
@@ -129,12 +143,14 @@ export class Dashboard implements OnInit {
             this.cdr.detectChanges();
           }
         });
+
     } else {
+
       this.http.get(`http://localhost:3000/albums/search?title=${term}`)
         .subscribe({
           next: (res: any) => {
             this.albums = res;
-            this.artists = []; 
+            this.artists = [];
             this.cdr.detectChanges();
           },
           error: (err: any) => {
@@ -145,14 +161,13 @@ export class Dashboard implements OnInit {
         });
     }
   }
+
   onSearchChange() {
     this.searchSubject.next(this.searchTerm);
   }
 
   logout() {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('userId');
-    }
+    localStorage.removeItem('token');
     this.router.navigate(['/login']);
   }
 }

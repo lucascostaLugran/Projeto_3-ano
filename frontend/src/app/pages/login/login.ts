@@ -52,11 +52,14 @@ export class Login {
       next: (res: any) => {
 
           localStorage.setItem('token', res.token);
+          console.log("LOGIN SUCCESS:", res);
 
 
           setTimeout(() => {
             this.router.navigate(['/dashboard']);
           }, 0);
+
+          this.cdr.detectChanges();
       },
       error: (err: any) => {
 
