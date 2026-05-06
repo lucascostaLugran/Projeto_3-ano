@@ -7,24 +7,34 @@ const artistSchema = new mongoose.Schema({
     unique: true,
     match: /^[0-9]{16}$/
   },
+
   name: {
     type: String,
     required: true,
     trim: true
   },
+
   startYear: {
     type: Number,
     required: true,
     min: 0
   },
-  description: {         
+
+  description: {
     type: String,
     default: ""
   },
+
   imageUrl: {
     type: String,
     default: ""
+  },
+
+  spotifyId: {
+    type: String,
+    default: ""
   }
+
 }, {
   timestamps: true
 });

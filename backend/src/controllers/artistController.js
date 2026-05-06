@@ -1,59 +1,76 @@
 const Artist = require("../models/Artist");
 const Album = require("../models/Album");
-const { getArtistImage } = require("../services/spotifyService");
-
+const {
+  getSpotifyArtist,
+  getArtistAlbums
+} = require("../services/spotifyService");
 
 exports.createArtist = async (req, res) => {
   try {
     const { name, isni, startYear } = req.body;
 
     if (!name || !isni || !startYear) {
-      return res.status(400).json({
-        message: "Todos os campos são obrigatórios"
-      });
+      return res.status(400).json({ message: "Todos os campos são obrigatórios" });
     }
 
     const artistExists = await Artist.findOne({ isni });
-
     if (artistExists) {
-      return res.status(400).json({
-        message: "Já existe um artista com este ISNI"
-      });
+      return res.status(400).json({ message: "Já existe um artista com este ISNI" });
     }
 
-    let imageUrl = null;
+    let imageUrl = "";
+    let spotifyId = "";
 
     try {
-      imageUrl = await getArtistImage(name);
+      const spotifyArtist = await getSpotifyArtist(name);
+      if (spotifyArtist) {
+        imageUrl = spotifyArtist.imageUrl;
+        spotifyId = spotifyArtist.spotifyId;
+      }
     } catch (err) {
       console.log("Spotify fetch error:", err.message);
     }
 
-    const artist = new Artist({
-      name,
-      isni,
-      startYear,
-      imageUrl
-    });
-
+    const artist = new Artist({ name, isni, startYear, imageUrl, spotifyId });
     await artist.save();
 
-    res.status(201).json({
-      message: "Artista criado com sucesso",
-      artist
-    });
+    if (spotifyId) {
+      try {
+        console.log("A buscar álbuns para spotifyId:", spotifyId);
+        const spotifyAlbums = await getArtistAlbums(spotifyId); 
+        console.log("Álbuns encontrados:", spotifyAlbums.length);
+
+        const albumsToInsert = spotifyAlbums.map(album => ({
+          spotifyId: album.spotifyId,
+          title: album.title,
+          year: album.year,
+          type: album.type,   
+          imageUrl: album.imageUrl,
+          tracks: album.tracks,
+          artist: artist._id
+        }));
+
+        if (albumsToInsert.length > 0) {
+          await Album.insertMany(albumsToInsert, { ordered: false });
+          console.log("Álbuns inseridos:", albumsToInsert.length);
+        }
+      } catch (err) {
+        console.error("Erro ao buscar/inserir álbuns:", err.message);
+      }
+    }
+
+    res.status(201).json({ message: "Artista e álbuns criados com sucesso", artist });
 
   } catch (error) {
     console.error("Create artist error:", error);
-    res.status(500).json({
-      message: "Erro no servidor"
-    });
+    res.status(500).json({ message: "Erro no servidor" });
   }
 };
 
-
 exports.createArtistsBulk = async (req, res) => {
+
   try {
+
     const artists = req.body;
 
     if (!Array.isArray(artists) || artists.length === 0) {
@@ -62,61 +79,89 @@ exports.createArtistsBulk = async (req, res) => {
       });
     }
 
-    for (const artist of artists) {
-      if (!artist.name || !artist.isni || !artist.startYear) {
-        return res.status(400).json({
-          message: "Todos os artistas devem ter name, isni e startYear"
-        });
+    const insertedArtists = [];
+
+    for (const item of artists) {
+
+      if (!item.name || !item.isni || !item.startYear) {
+        continue;
       }
-    }
 
-    const existing = await Artist.find({
-      isni: { $in: artists.map(a => a.isni) }
-    });
-
-    const existingIsnis = existing.map(a => a.isni);
-
-    const newArtists = artists.filter(
-      a => !existingIsnis.includes(a.isni)
-    );
-
-    if (newArtists.length === 0) {
-      return res.status(400).json({
-        message: "Todos os artistas já existem"
+      const exists = await Artist.findOne({
+        isni: item.isni
       });
-    }
 
-    const artistsWithImages = [];
+      if (exists) {
+        continue;
+      }
 
-    for (const artist of newArtists) {
-      let imageUrl = null;
+      let imageUrl = "";
+      let spotifyId = "";
 
       try {
-        imageUrl = await getArtistImage(artist.name);
+
+        const spotifyArtist = await getSpotifyArtist(item.name);
+
+        if (spotifyArtist) {
+          imageUrl = spotifyArtist.imageUrl;
+          spotifyId = spotifyArtist.spotifyId;
+        }
+
       } catch (err) {
         console.log("Spotify fetch error:", err.message);
       }
 
-      artistsWithImages.push({
-        ...artist,
-        imageUrl
+      const artist = await Artist.create({
+        name: item.name,
+        isni: item.isni,
+        startYear: item.startYear,
+        description: item.description || "",
+        imageUrl,
+        spotifyId
       });
+
+      insertedArtists.push(artist);
+
+      if (spotifyId) {
+
+        const spotifyAlbums = await getArtistAlbums(item.name);
+
+        const albumsToInsert = spotifyAlbums.map(album => ({
+          spotifyId: album.spotifyId,
+          title: album.title,
+          year: album.year,
+          type: album.type,
+          imageUrl: album.imageUrl,
+          tracks: album.tracks,
+          artist: artist._id
+        }));
+
+        if (albumsToInsert.length > 0) {
+
+          await Album.insertMany(albumsToInsert, {
+            ordered: false
+          });
+
+        }
+      }
     }
 
-    const inserted = await Artist.insertMany(artistsWithImages);
-
     res.status(201).json({
-      message: `${inserted.length} artistas inseridos com sucesso`,
-      inserted
+      message: `${insertedArtists.length} artistas inseridos com sucesso`,
+      inserted: insertedArtists
     });
 
   } catch (error) {
+
     console.error("Bulk insert error:", error);
+
     res.status(500).json({
       message: "Erro no servidor"
     });
   }
 };
+
+
 
 exports.updateArtistsBulk = async (req, res) => {
   try {

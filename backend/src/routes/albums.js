@@ -5,8 +5,4 @@ const albumController = require('../controllers/albumController');
 router.get("/search", albumController.searchAlbums);
 router.get("/:id", albumController.getAlbumById);
 
-
-router.post("/", albumController.createAlbum);
-router.post("/bulk", albumController.createAlbumsBulk);
-
 module.exports = router;
