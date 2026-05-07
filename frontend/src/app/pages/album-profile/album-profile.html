@@ -8,7 +8,7 @@
 
     <button routerLink="/dashboard">🏠 Home</button>
     <button routerLink="/collection">📚 Coleção</button>
-
+    <button routerLink="/notifications">🔔 Notificações</button>
     <div class="sidebar-bottom">
       <button class="user-display" routerLink="/profile">
         👤 {{ user?.username || 'Perfil' }}
@@ -76,7 +76,8 @@
 
       </div>
 
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+      <div
+        style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
         <h2 class="section-title" style="margin: 0; border: none; padding: 0;">
           Versões Disponíveis
         </h2>
@@ -123,8 +124,7 @@
   <div class="modal-overlay" *ngIf="isRequestModalOpen">
     <div class="modal">
 
-      <div *ngIf="requestMessage || requestError" class="toast"
-           [ngClass]="requestError ? 'error' : 'neutral'">
+      <div *ngIf="requestMessage || requestError" class="toast" [ngClass]="requestError ? 'error' : 'neutral'">
         {{ requestError || requestMessage }}
       </div>
 
@@ -136,7 +136,7 @@
       </div>
 
       <div class="input-group">
-        <select [(ngModel)]="requestData.format">
+        <select [(ngModel)]="requestData.format" (change)="requestData.description = ''">
           <option value="" disabled>Formato</option>
           <option value="CD">💿 CD</option>
           <option value="Vinyl">📀 Vinyl</option>
@@ -145,8 +145,17 @@
       </div>
 
       <div class="input-group">
-        <input [(ngModel)]="requestData.description" placeholder=" " />
-        <label>Designação (opcional)</label>
+        <select [(ngModel)]="requestData.description" [disabled]="!requestData.format">
+
+          <option value="" disabled>
+            Designação
+          </option>
+
+          <option *ngFor="let version of filteredDescriptions" [value]="version.description">
+            {{ version.description }}
+          </option>
+
+        </select>
       </div>
 
       <div class="modal-actions">

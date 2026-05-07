@@ -37,6 +37,42 @@ export class AlbumProfile implements OnInit {
     description: ''
   };
 
+  allVersions = [
+
+    { format: "CD", description: "Standard" },
+    { format: "CD", description: "Deluxe" },
+    { format: "CD", description: "Deluxe Edition" },
+    { format: "CD", description: "Remastered" },
+    { format: "CD", description: "Anniversary Edition" },
+    { format: "CD", description: "Collector's Edition" },
+    { format: "CD", description: "Expanded Edition" },
+    { format: "CD", description: "Japanese Edition" },
+
+    { format: "Vinyl", description: "180g" },
+    { format: "Vinyl", description: "180g Deluxe" },
+    { format: "Vinyl", description: "Colored Vinyl" },
+    { format: "Vinyl", description: "Transparent Vinyl" },
+    { format: "Vinyl", description: "Picture Disc" },
+    { format: "Vinyl", description: "Gatefold Edition" },
+    { format: "Vinyl", description: "Deluxe Edition" },
+    { format: "Vinyl", description: "Remastered" },
+    { format: "Vinyl", description: "Limited Edition" },
+    { format: "Vinyl", description: "Anniversary Edition" },
+
+    { format: "Cassette", description: "Standard" },
+    { format: "Cassette", description: "Limited Edition" },
+    { format: "Cassette", description: "Collector's Edition" },
+    { format: "Cassette", description: "Colored Cassette" },
+    { format: "Cassette", description: "Anniversary Edition" }
+
+  ];
+
+  get filteredDescriptions() {
+    return this.allVersions.filter(
+      v => v.format === this.requestData.format
+    );
+  }
+
 
   ngOnInit() {
     if (typeof window !== 'undefined') {

@@ -37,20 +37,37 @@ exports.createArtist = async (req, res) => {
     if (spotifyId) {
       try {
         console.log("A buscar álbuns para spotifyId:", spotifyId);
-        const spotifyAlbums = await getArtistAlbums(spotifyId); 
+        const spotifyAlbums = await getArtistAlbums(spotifyId);
         console.log("Álbuns encontrados:", spotifyAlbums.length);
         const allVersions = [
-          { format: "CD", description: "" },
+          { format: "CD", description: "Standard" },
           { format: "CD", description: "Deluxe" },
+          { format: "CD", description: "Deluxe Edition" },
+          { format: "CD", description: "Remastered" },
+          { format: "CD", description: "Anniversary Edition" },
+          { format: "CD", description: "Collector's Edition" },
+          { format: "CD", description: "Expanded Edition" },
+
           { format: "Vinyl", description: "180g" },
-          { format: "Vinyl", description: "Deluxe Edition" },
+          { format: "Vinyl", description: "180g Deluxe" },
+          { format: "Vinyl", description: "Colored Vinyl" },
+          { format: "Vinyl", description: "Transparent Vinyl" },
+          { format: "Vinyl", description: "Picture Disc" },
           { format: "Vinyl", description: "Remastered" },
-          { format: "Cassette", description: "Limited Edition" }
+          { format: "Vinyl", description: "Deluxe Edition" },
+          { format: "Vinyl", description: "Limited Edition" },
+          { format: "Vinyl", description: "Gatefold Edition" },
+
+          { format: "Cassette", description: "Standard" },
+          { format: "Cassette", description: "Limited Edition" },
+          { format: "Cassette", description: "Collector's Edition" },
+          { format: "Cassette", description: "Colored Cassette" },
+          { format: "Cassette", description: "Anniversary Edition" }
         ];
-        
+
         const generateEAN = () =>
           Math.floor(Math.random() * 1e13).toString().padStart(13, "0");
-        
+
         const shuffle = (array) => array.sort(() => Math.random() - 0.5);
 
         const albumsToInsert = spotifyAlbums.map(album => {
@@ -58,7 +75,7 @@ exports.createArtist = async (req, res) => {
 
           const shuffled = shuffle([...allVersions]);
           const numVersions = Math.floor(Math.random() * 4) + 1;
-        
+
           const selected = shuffled.slice(0, numVersions);
 
           const versions = selected.map(v => ({
@@ -66,7 +83,7 @@ exports.createArtist = async (req, res) => {
             format: v.format,
             description: v.description
           }));
-        
+
           return {
             spotifyId: album.spotifyId,
             mbid: album.spotifyId,
@@ -76,7 +93,7 @@ exports.createArtist = async (req, res) => {
             imageUrl: album.imageUrl,
             tracks: album.tracks,
             artist: artist._id,
-            versions 
+            versions
           };
         });
 

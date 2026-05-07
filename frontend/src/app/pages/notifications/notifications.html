@@ -1,0 +1,84 @@
+<div class="dashboard">
+
+  <div class="sidebar">
+
+    <div class="logo-container">
+      <img src="/assets/logo.png" class="logo" />
+    </div>
+
+    <button routerLink="/dashboard">🏠 Home</button>
+    <button routerLink="/collection">📚 Coleção</button>
+    <button routerLink="/notifications">🔔 Notificações</button>
+
+    <div class="sidebar-bottom">
+      <button class="user-display" routerLink="/profile">
+        👤 {{ user.username }}
+      </button>
+      <button (click)="logout()">⏻ Logout</button>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <div *ngIf="message" class="toast-global">
+      {{ message }}
+    </div>
+
+    <h1>Notificações</h1>
+
+    <p *ngIf="notifications.length === 0" class="empty">
+      Não tens notificações.
+    </p>
+
+    <div class="notif-list">
+
+      <div
+        *ngFor="let n of notifications"
+        class="notif-card"
+        [ngClass]="{ 'unread': !n.read }"
+      >
+
+        <div class="notif-header">
+          <span class="notif-status" [ngClass]="n.request?.status">
+            {{ n.request?.status === 'aceite' ? '✅ Pedido aceite' : '❌ Pedido recusado' }}
+          </span>
+          <span class="notif-date">
+            {{ n.createdAt | date:'dd/MM/yyyy HH:mm' }}
+          </span>
+        </div>
+
+        <div
+          class="notif-body"
+          (click)="goToAlbum(n)"
+          [class.clickable]="n.request?.status === 'aceite'"
+        >
+          <img
+            *ngIf="n.request?.album?.imageUrl"
+            [src]="n.request.album.imageUrl"
+            class="notif-album-cover"
+            alt="Capa do álbum"
+          />
+
+          <div class="notif-info">
+            <span class="notif-album-title">
+              {{ n.request?.album?.title || 'Álbum desconhecido' }}
+            </span>
+            <span class="notif-message">{{ n.message }}</span>
+          </div>
+        </div>
+
+        <button
+          *ngIf="!n.read"
+          class="mark-read-btn"
+          (click)="markAsRead(n._id)"
+        >
+          Marcar como lida
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

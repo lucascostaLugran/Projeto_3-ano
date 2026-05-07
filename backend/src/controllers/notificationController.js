@@ -2,16 +2,32 @@ const Notification = require("../models/Notification");
 
 exports.getNotifications = async (req, res) => {
   try {
-    const notifications = await Notification.find({ user: req.userId })
-      .populate('request')
-      .sort({ createdAt: -1 });
+
+    const notifications = await Notification.find({
+      user: req.userId
+    })
+
+    .populate({
+      path: 'request',
+      model: 'Request',
+      populate: {
+        path: 'album',
+        model: 'Album',
+        select: 'title imageUrl _id'
+      }
+    })
+
+    .sort({ createdAt: -1 });
+
+    console.log(JSON.stringify(notifications, null, 2));
 
     res.json(notifications);
+
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Erro no servidor" });
   }
 };
-
 exports.markAsRead = async (req, res) => {
   try {
     await Notification.findByIdAndUpdate(req.params.id, { read: true });
