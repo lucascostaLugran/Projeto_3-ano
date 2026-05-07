@@ -23,12 +23,14 @@ export class Profile {
     username: '',
     email: '',
     birthDate: '',
+    currentPassword: '',
     password: '',
     confirmPassword: ''
   };
 
   showPassword = false;
   showConfirmPassword = false;
+  showCurrentPassword = false;
 
   error = '';
   message = '';
@@ -86,6 +88,7 @@ export class Profile {
       username: this.user.username || '',
       email: this.user.email || '',
       birthDate: this.user.birthDate?.substring(0, 10) || '',
+      currentPassword: '',
       password: '',
       confirmPassword: ''
     };
@@ -98,16 +101,31 @@ export class Profile {
     this.error = '';
     this.message = '';
 
-    if (this.editData.password && this.editData.password !== this.editData.confirmPassword) {
-      this.error = "As passwords não coincidem";
-      this.cdr.detectChanges();
+    if (this.editData.password || this.editData.confirmPassword) {
 
-      setTimeout(() => {
-        this.error = '';
+      if (!this.editData.currentPassword) {
+        this.error = "Tens de inserir a password atual";
         this.cdr.detectChanges();
-      }, 2000);
 
-      return;
+        setTimeout(() => {
+          this.error = '';
+          this.cdr.detectChanges();
+        }, 2000);
+
+        return;
+      }
+
+      if (this.editData.password !== this.editData.confirmPassword) {
+        this.error = "As passwords não coincidem";
+        this.cdr.detectChanges();
+
+        setTimeout(() => {
+          this.error = '';
+          this.cdr.detectChanges();
+        }, 2000);
+
+        return;
+      }
     }
 
     if (this.editData.birthDate) {
@@ -140,6 +158,7 @@ export class Profile {
     if (this.editData.email) body.email = this.editData.email;
     if (this.editData.birthDate) body.birthDate = this.editData.birthDate;
     if (this.editData.password) body.password = this.editData.password;
+    if (this.editData.currentPassword) body.currentPassword = this.editData.currentPassword;
 
     if (typeof window === 'undefined') return;
 

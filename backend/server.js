@@ -20,6 +20,12 @@ app.use("/artists", artistRoutes);
 const albumRoutes = require("./src/routes/albums");
 app.use("/albums", albumRoutes);
 
+const requestRoutes = require("./src/routes/requests");
+app.use("/requests", requestRoutes);
+
+const notificationRoutes = require("./src/routes/notifications");
+app.use("/notifications", notificationRoutes);
+
 app.get("/", (req, res) => {
   res.send("API is running...");
 });

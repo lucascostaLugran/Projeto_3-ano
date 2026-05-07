@@ -1,6 +1,5 @@
 <div class="dashboard">
 
-
   <div class="sidebar">
 
     <div class="logo-container">
@@ -18,6 +17,7 @@
       <button (click)="logout()">⏻ Logout</button>
     </div>
   </div>
+
   <div class="main" *ngIf="album">
 
     <div *ngIf="message" class="toast" [ngClass]="messageType">
@@ -28,11 +28,7 @@
 
       <div class="artist-row">
 
-        <img
-          [src]="album.imageUrl"
-          class="album-cover-styled"
-          alt="Capa do álbum"
-        />
+        <img [src]="album.imageUrl" class="album-cover-styled" alt="Capa do álbum" />
 
         <div class="artist-meta">
 
@@ -42,11 +38,7 @@
 
           <p class="subtitle">Artista</p>
 
-          <div
-            class="artist-pill"
-            *ngIf="album.artist?._id"
-            [routerLink]="['/artist', album.artist._id]"
-          >
+          <div class="artist-pill" *ngIf="album.artist?._id" [routerLink]="['/artist', album.artist._id]">
             🎧 {{ album.artist.name }}
           </div>
 
@@ -66,17 +58,13 @@
 
       </div>
 
-  
       <h2 class="section-title">
         Faixas
       </h2>
 
       <div class="albums">
 
-        <div
-          *ngFor="let track of album.tracks"
-          class="album-card"
-        >
+        <div *ngFor="let track of album.tracks" class="album-card">
           <span>
             {{ track.number }}. {{ track.title }}
           </span>
@@ -88,46 +76,85 @@
 
       </div>
 
-      <h2 class="section-title">
-        Versões Disponíveis
-      </h2>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+        <h2 class="section-title" style="margin: 0; border: none; padding: 0;">
+          Versões Disponíveis
+        </h2>
+        <button class="request-btn" (click)="openRequestModal()">
+          + Pedir Versão
+        </button>
+      </div>
 
       <div class="albums">
 
         <div *ngFor="let v of album.versions" class="album-card">
 
           <div class="version-left">
-        
+
             <strong class="version-format">
               {{ v.format === 'CD' ? '💿' : v.format === 'Vinyl' ? '📀' : '📼' }}
               {{ v.format | uppercase }}
             </strong>
-        
-            <button
-            class="add-icon-btn"
-            (click)="addToCollection(v.ean13)"
-            [disabled]="isInCollection(v.ean13)"
-            [ngClass]="{ 'disabled-btn': isInCollection(v.ean13) }"
-          >
-            {{ isInCollection(v.ean13) ? '✓' : '+' }}
-          </button>
-        
+
+            <button class="add-icon-btn" (click)="addToCollection(v.ean13)" [disabled]="isInCollection(v.ean13)"
+              [ngClass]="{ 'disabled-btn': isInCollection(v.ean13) }">
+              {{ isInCollection(v.ean13) ? '✓' : '+' }}
+            </button>
+
             <div class="version-description" *ngIf="v.description">
               {{ v.description }}
             </div>
-        
+
           </div>
-        
+
           <code class="ean-code">
             {{ v.ean13 }}
           </code>
-        
+
         </div>
 
       </div>
 
     </div>
 
+  </div>
+
+  <!-- Modal de pedido de versão -->
+  <div class="modal-overlay" *ngIf="isRequestModalOpen">
+    <div class="modal">
+
+      <div *ngIf="requestMessage || requestError" class="toast"
+           [ngClass]="requestError ? 'error' : 'neutral'">
+        {{ requestError || requestMessage }}
+      </div>
+
+      <h2>Pedir Nova Versão</h2>
+
+      <div class="input-group">
+        <input [(ngModel)]="requestData.ean13" placeholder=" " maxlength="13" />
+        <label>EAN-13 (13 dígitos)</label>
+      </div>
+
+      <div class="input-group">
+        <select [(ngModel)]="requestData.format">
+          <option value="" disabled>Formato</option>
+          <option value="CD">💿 CD</option>
+          <option value="Vinyl">📀 Vinyl</option>
+          <option value="Cassette">📼 Cassette</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <input [(ngModel)]="requestData.description" placeholder=" " />
+        <label>Designação (opcional)</label>
+      </div>
+
+      <div class="modal-actions">
+        <button (click)="submitRequest()">Submeter</button>
+        <button (click)="isRequestModalOpen = false">Cancelar</button>
+      </div>
+
+    </div>
   </div>
 
 </div>

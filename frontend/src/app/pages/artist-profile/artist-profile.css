@@ -110,11 +110,6 @@
   margin: 5px 0;
 }
 
-.section-title {
-  margin-top: 30px;
-  margin-bottom: 15px;
-}
-
 .albums {
   display: flex;
   flex-direction: column;
@@ -126,9 +121,6 @@
   padding: 15px 20px;
   border-radius: 12px;
   border: 1px solid var(--border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   transition: 0.2s;
   cursor: pointer;
 }
@@ -137,25 +129,43 @@
   background: #1f1f2e;
 }
 
-.album-info {
+.album-row {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.album-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.album-meta {
+  flex: 1;
 }
 
 .album-title {
   font-weight: 500;
 }
 
-.album-type {
-  font-size: 16px;
-  font-weight: 600;
-  opacity: 0.85;
-  margin-top: 4px;
+.album-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4px;
 }
 
 .album-year {
   color: var(--primary);
   font-weight: bold;
+}
+
+.album-type {
+  font-size: 14px;
+  opacity: 0.8;
 }
 
 .fav-btn {
@@ -239,24 +249,10 @@
 }
 
 @keyframes fadeInOut {
-  0% {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-
-  10% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  85% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
+  0% { opacity: 0; transform: translateY(-20px); }
+  10% { opacity: 1; transform: translateY(0); }
+  85% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-10px); }
 }
 
 @media (max-width: 768px) {

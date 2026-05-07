@@ -7,6 +7,7 @@
     </div>
 
     <button routerLink="/dashboard">🏠 Home</button>
+    <button routerLink="/collection">📚 Coleção</button>
 
     <div class="sidebar-bottom">
       <button class="user-display" routerLink="/profile">
@@ -67,7 +68,11 @@
 
     <div class="modal-overlay" *ngIf="isEditing">
 
-      <div class="modal">
+      <form class="modal" autocomplete="off">
+
+        <!-- inputs fake para bloquear autofill -->
+        <input type="text" style="display:none">
+        <input type="password" style="display:none">
 
         <div *ngIf="message || error" class="toast" [ngClass]="{ 'error': error }">
           {{ error || message }}
@@ -76,49 +81,63 @@
         <h2>Editar Perfil</h2>
 
         <div class="input-group">
-          <input [(ngModel)]="editData.username" placeholder=" " />
+          <input [(ngModel)]="editData.username" name="edit-username" placeholder=" " autocomplete="off" />
           <label>Username</label>
         </div>
 
         <div class="input-group">
-          <input [(ngModel)]="editData.email" placeholder=" " />
+          <input [(ngModel)]="editData.email" name="edit-email" placeholder=" " autocomplete="off" />
           <label>Email</label>
         </div>
 
         <div class="input-group">
-          <input type="date" [(ngModel)]="editData.birthDate" placeholder=" " />
+          <input type="date" [(ngModel)]="editData.birthDate" name="edit-birth" placeholder=" " autocomplete="off" />
           <label>Data de nascimento</label>
         </div>
 
         <div *ngIf="user && user.favoriteArtist !== null" class="fav-remove">
-          <button (click)="removeFavorite()">Remover artista favorito</button>
+          <button type="button" (click)="removeFavorite()">Remover artista favorito</button>
         </div>
 
         <div class="password-wrapper input-group">
-          <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="editData.password" placeholder=" " />
+          <input 
+            type="password"
+            [(ngModel)]="editData.currentPassword"
+            name="nope-current"
+            placeholder=" "
+            autocomplete="off"
+          />
+          <label>Password atual</label>
+        </div>
+
+        <div class="password-wrapper input-group">
+          <input 
+            type="password"
+            [(ngModel)]="editData.password"
+            name="nope-new"
+            placeholder=" "
+            autocomplete="new-password"
+          />
           <label>Nova password</label>
-
-          <span (click)="showPassword = !showPassword">
-            {{ showPassword ? 'Hide' : 'Show' }}
-          </span>
         </div>
 
         <div class="password-wrapper input-group">
-          <input [type]="showConfirmPassword ? 'text' : 'password'" [(ngModel)]="editData.confirmPassword"
-            placeholder=" " />
+          <input 
+            type="password"
+            [(ngModel)]="editData.confirmPassword"
+            name="nope-confirm"
+            placeholder=" "
+            autocomplete="new-password"
+          />
           <label>Confirmar password</label>
-
-          <span (click)="showConfirmPassword = !showConfirmPassword">
-            {{ showConfirmPassword ? 'Hide' : 'Show' }}
-          </span>
         </div>
 
         <div class="modal-actions">
-          <button (click)="updateProfile()">Guardar</button>
-          <button (click)="isEditing = false">Cancelar</button>
+          <button type="button" (click)="updateProfile()">Guardar</button>
+          <button type="button" (click)="isEditing = false">Cancelar</button>
         </div>
 
-      </div>
+      </form>
 
     </div>
 

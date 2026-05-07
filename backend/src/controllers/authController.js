@@ -117,13 +117,24 @@ exports.updateProfile = async (req, res) => {
       return res.status(404).json({ message: "User não encontrado" });
     }
 
-    const { username, email, password, birthDate } = req.body;
+    const { username, email, password, birthDate, currentPassword } = req.body;
 
     if (username) user.username = username;
     if (email) user.email = email;
     if (birthDate) user.birthDate = new Date(birthDate);
 
     if (password) {
+
+      if (!currentPassword) {
+        return res.status(400).json({ message: "Password atual é obrigatória" });
+      }
+
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+
+      if (!isMatch) {
+        return res.status(401).json({ message: "Password atual incorreta" });
+      }
+
       user.password = await bcrypt.hash(password, 10);
     }
 
@@ -131,11 +142,11 @@ exports.updateProfile = async (req, res) => {
 
     res.json({ message: "Perfil atualizado com sucesso" });
 
-  } catch {
+  } catch (err) {
+    console.error("UPDATE PROFILE ERROR:", err);
     res.status(500).json({ message: "Erro no servidor" });
   }
 };
-
 exports.addFavoriteArtist = async (req, res) => {
   try {
     const user = await User.findById(req.userId);
@@ -232,11 +243,14 @@ exports.getCollection = async (req, res) => {
         title: album?.title,
         year: album?.year,
         artist: album?.artist?.name || 'Vários Artistas',
-
+        artistId: album?.artist?._id,
+      
+        imageUrl: album?.imageUrl,   
+      
         ean13: item.ean13,
         format: version?.format || 'N/A',
         description: version?.description || '',
-
+      
         addedAt: item.addedAt
       };
     });

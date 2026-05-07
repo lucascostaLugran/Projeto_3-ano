@@ -149,25 +149,49 @@
   transition: 0.2s;
 }
 
+.artist-card {
+  background: var(--card);
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  transition: 0.2s;
+  cursor: pointer;
+}
+
 .artist-card:hover {
   background: #1f1f2e;
 }
 
-.artist-name {
-  color: #7f5af0;
-  cursor: pointer;
-  margin-bottom: 10px;
+.artist-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.artist-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid var(--border);
   transition: 0.2s;
 }
 
-.artist-name:hover {
-  color: #9d7bff;
+.artist-card:hover .artist-image {
+  transform: scale(1.05);
 }
 
-.artist-description {
-  color: #ccc;
-  font-size: 14px;
-  margin-bottom: 15px;
+.artist-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.artist-name {
+  color: var(--primary);
+  font-size: 20px;
+  margin: 0;
 }
 
 .fav-btn {
@@ -178,6 +202,7 @@
   color: white;
   cursor: pointer;
   transition: 0.2s;
+  width: fit-content;
 }
 
 .fav-btn:hover {
@@ -266,6 +291,60 @@
 .toast-global.error {
   background: #3a1f1f;
   border: 1px solid #ff4d4d;
+}
+.album-card {
+  background: var(--card);
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  transition: 0.2s;
+  cursor: pointer;
+  position: relative;
+}
+
+.album-card:hover {
+  background: #1f1f2e;
+}
+
+.album-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.album-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+}
+
+.album-meta {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+}
+
+.album-title {
+  color: var(--primary);
+  margin: 0;
+  font-size: 18px;
+}
+
+.album-artist {
+  color: var(--text-secondary);
+  margin: 4px 0 0 0;
+  font-size: 14px;
+}
+
+.album-year {
+  position: absolute;
+  bottom: 15px;
+  right: 20px;
+  color: var(--primary);
+  font-weight: bold;
 }
 
 @keyframes slideDown {

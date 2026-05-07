@@ -166,14 +166,20 @@ export class Dashboard implements OnInit {
     }
   }
 
-  onSearchChange() {
-    this.searchSubject.next(this.searchTerm);
-  }
+      onSearchChange() {
+        this.searchSubject.next(this.searchTerm);
+      }
+      goToArtist(id: string) {
+        this.router.navigate(['/artist', id]);
+      }
+      goToAlbum(id: string) {
+        this.router.navigate(['/album', id]);
+      }
 
-  logout() {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('token');
+      logout() {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('token');
+        }
+        this.router.navigate(['/login']);
+      }
     }
-    this.router.navigate(['/login']);
-  }
-}

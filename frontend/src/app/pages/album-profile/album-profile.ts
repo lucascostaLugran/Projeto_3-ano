@@ -1,12 +1,13 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router'; 
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-album-profile',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './album-profile.html',
   styleUrls: ['./album-profile.css']
 })
@@ -25,7 +26,17 @@ export class AlbumProfile implements OnInit {
   message = '';
   messageType = 'neutral';
 
-  token: string = ''; 
+  token: string = '';
+  isRequestModalOpen = false;
+  requestMessage = '';
+  requestError = '';
+
+  requestData = {
+    ean13: '',
+    format: '',
+    description: ''
+  };
+
 
   ngOnInit() {
     if (typeof window !== 'undefined') {
@@ -38,7 +49,7 @@ export class AlbumProfile implements OnInit {
     }
 
     this.loadUserProfile();
-    this.loadCollection(); 
+    this.loadCollection();
 
     const id = this.route.snapshot.paramMap.get('id');
 
@@ -56,7 +67,7 @@ export class AlbumProfile implements OnInit {
   loadUserProfile() {
     this.http.get(`http://localhost:3000/auth/profile`, {
       headers: {
-        Authorization: `Bearer ${this.token}` 
+        Authorization: `Bearer ${this.token}`
       }
     }).subscribe({
       next: (res: any) => {
@@ -79,7 +90,7 @@ export class AlbumProfile implements OnInit {
     });
   }
 
-  // ✅ FALTAVA ISTO
+
   isInCollection(ean13: string): boolean {
     return this.collection.some(item => item.ean13 === ean13);
   }
@@ -92,7 +103,7 @@ export class AlbumProfile implements OnInit {
 
   addToCollection(ean13: string) {
     if (!this.token || !this.album) return;
-  
+
     this.http.post(
       'http://localhost:3000/albums/collection',
       {
@@ -112,7 +123,7 @@ export class AlbumProfile implements OnInit {
         this.loadCollection();
 
         this.cdr.detectChanges();
-  
+
         setTimeout(() => {
           this.message = '';
           this.cdr.detectChanges();
@@ -121,9 +132,9 @@ export class AlbumProfile implements OnInit {
       error: (err: any) => {
         this.message = err.error?.message || 'Erro ao adicionar';
         this.messageType = 'error';
-  
+
         this.cdr.detectChanges();
-  
+
         setTimeout(() => {
           this.message = '';
           this.cdr.detectChanges();
@@ -132,10 +143,62 @@ export class AlbumProfile implements OnInit {
     });
   }
 
+  openRequestModal() {
+    this.requestData = { ean13: '', format: '', description: '' };
+    this.requestMessage = '';
+    this.requestError = '';
+    this.isRequestModalOpen = true;
+  }
+
+  submitRequest() {
+    if (!this.requestData.ean13 || !this.requestData.format) {
+      this.requestError = 'EAN-13 e formato são obrigatórios';
+      this.cdr.detectChanges();
+      setTimeout(() => { this.requestError = ''; this.cdr.detectChanges(); }, 2000);
+      return;
+    }
+
+    if (!/^\d{13}$/.test(this.requestData.ean13)) {
+      this.requestError = 'EAN-13 deve ter exatamente 13 dígitos';
+      this.cdr.detectChanges();
+      setTimeout(() => { this.requestError = ''; this.cdr.detectChanges(); }, 2000);
+      return;
+    }
+
+    this.http.post(
+      'http://localhost:3000/requests',
+      {
+        albumId: this.album._id,
+        ean13: this.requestData.ean13,
+        format: this.requestData.format,
+        description: this.requestData.description
+      },
+      { headers: { Authorization: `Bearer ${this.token}` } }
+    ).subscribe({
+      next: (res: any) => {
+        this.requestMessage = 'Pedido submetido com sucesso!';
+        this.cdr.detectChanges();
+        setTimeout(() => {
+          this.isRequestModalOpen = false;
+          this.requestMessage = '';
+          this.cdr.detectChanges();
+        }, 2000);
+      },
+      error: (err: any) => {
+        this.requestError = err.error?.message || 'Erro ao submeter pedido';
+        this.cdr.detectChanges();
+        setTimeout(() => { this.requestError = ''; this.cdr.detectChanges(); }, 2000);
+      }
+    });
+  }
+
   logout() {
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('token'); 
+      localStorage.removeItem('token');
     }
     this.router.navigate(['/login']);
   }
+
+
 }
+
