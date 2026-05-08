@@ -34,7 +34,7 @@
         <option value="addedAt">Data</option>
       </select>
 
-      <button (click)="toggleSort()">Ordenar</button>
+      <button (click)="toggleSort()">{{ sortDirection === 'asc' ? 'Crescente ▲' : 'Descendente ▼' }}</button>
     </div>
 
     <div class="results">

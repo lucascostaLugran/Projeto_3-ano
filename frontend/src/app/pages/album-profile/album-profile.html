@@ -97,9 +97,18 @@
               {{ v.format | uppercase }}
             </strong>
 
-            <button class="add-icon-btn" (click)="addToCollection(v.ean13)" [disabled]="isInCollection(v.ean13)"
-              [ngClass]="{ 'disabled-btn': isInCollection(v.ean13) }">
-              {{ isInCollection(v.ean13) ? '✓' : '+' }}
+            <button 
+              class="collection-pill" 
+              (click)="addToCollection(v.ean13)" 
+              [disabled]="isInCollection(v.ean13)">
+              <ng-container *ngIf="!isInCollection(v.ean13)">
+                <span>➕</span>
+                <span>Coleção</span>
+              </ng-container>
+              <ng-container *ngIf="isInCollection(v.ean13)">
+                <span>✅</span>
+              </ng-container>
+
             </button>
 
             <div class="version-description" *ngIf="v.description">
