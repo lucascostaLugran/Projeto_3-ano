@@ -1,0 +1,105 @@
+<div class="dashboard">
+
+  <div class="sidebar">
+
+    <div class="logo-container">
+      <img src="/assets/logo.png" class="logo" />
+    </div>
+
+    <button routerLink="/dashboard">🏠 Home</button>
+    <button routerLink="/collection">📚 Coleção</button>
+    <button routerLink="/request">📨 Pedidos</button>
+
+    <div class="sidebar-bottom">
+      <button class="user-display" routerLink="/profile">
+        👤 {{ user.username }}
+      </button>
+      <button (click)="logout()">⏻ Logout</button>
+    </div>
+
+  </div>
+
+  <div class="main">
+
+    <div *ngIf="message" class="toast-global">
+      {{ message }}
+    </div>
+
+    <h1>Pedidos</h1>
+
+    <div class="filters">
+
+      <button [class.active]="selectedStatus === ''" (click)="filterByStatus('')">
+        Todos
+      </button>
+
+      <button [class.active]="selectedStatus === 'em análise'" (click)="filterByStatus('em análise')">
+        🕐 Em análise
+      </button>
+
+      <button [class.active]="selectedStatus === 'aceite'" (click)="filterByStatus('aceite')">
+        ✅ Aceites
+      </button>
+
+      <button [class.active]="selectedStatus === 'recusado'" (click)="filterByStatus('recusado')">
+        ❌ Recusados
+      </button>
+
+    </div>
+
+    <p *ngIf="filteredRequests.length === 0" class="empty">
+      Não tens pedidos.
+    </p>
+
+    <div class="notif-list">
+
+      <div *ngFor="let r of filteredRequests" class="notif-card">
+
+        <div class="notif-header">
+
+          <span class="notif-status" [ngClass]="r.status">
+            {{ getStatusLabel(r.status) }}
+          </span>
+
+          <span class="notif-date">
+            {{ r.createdAt | date:'dd/MM/yyyy HH:mm' }}
+          </span>
+
+        </div>
+
+        <div class="notif-body clickable" (click)="goToAlbum(r)">
+
+          <img *ngIf="r.album?.imageUrl" [src]="r.album.imageUrl" class="notif-album-cover" alt="Capa do álbum" />
+
+          <div class="notif-info">
+
+            <span class="notif-album-title">
+              {{ r.album?.title || 'Álbum desconhecido' }}
+            </span>
+
+            <span class="notif-message">
+
+              {{ getFormatIcon(r.format) }}
+              {{ r.format }}
+
+              <span *ngIf="r.description">
+                • {{ r.description }}
+              </span>
+
+            </span>
+
+            <span class="notif-message">
+              EAN-13: {{ r.ean13 }}
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

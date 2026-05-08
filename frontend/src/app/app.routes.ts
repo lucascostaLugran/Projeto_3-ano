@@ -6,14 +6,14 @@ import { Profile } from './pages/profile/profile';
 import { ArtistProfile } from './pages/artist-profile/artist-profile';
 import { AlbumProfile } from './pages/album-profile/album-profile';
 import { Collection } from './pages/collection/collection';
-import { Notifications } from './pages/notifications/notifications';
+import { Requests} from './pages/request/request';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
   { path: 'register', component: Register },
   { path: 'dashboard', component: Dashboard },
   { path: 'profile', component: Profile },
-  { path: 'notifications', component: Notifications },
+  { path: 'request', component: Requests },
   { path: 'artist/:id', component: ArtistProfile },
   { path: 'album/:id', component: AlbumProfile }, 
   { path: 'collection', component: Collection }, 

@@ -31,11 +31,15 @@ export class Dashboard implements OnInit {
 
   token: string = '';
 
+  notifications: any[] = [];
+
+  isNotifOpen = false;
+
   constructor(
     private http: HttpClient,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit() {
 
@@ -49,6 +53,7 @@ export class Dashboard implements OnInit {
     }
 
     this.loadProfile();
+    this.loadNotifications();
 
     this.searchSubject.pipe(
       debounceTime(300)
@@ -67,21 +72,21 @@ export class Dashboard implements OnInit {
     this.http.get('http://localhost:3000/auth/profile', {
       headers: this.getAuthHeaders()
     })
-    .subscribe({
-      next: (res: any) => {
-        this.user = { ...res };
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.error = 'Erro ao carregar o perfil do utilizador.';
-        this.cdr.detectChanges();
-
-        setTimeout(() => {
-          this.error = '';
+      .subscribe({
+        next: (res: any) => {
+          this.user = { ...res };
           this.cdr.detectChanges();
-        }, 2000);
-      }
-    });
+        },
+        error: () => {
+          this.error = 'Erro ao carregar o perfil do utilizador.';
+          this.cdr.detectChanges();
+
+          setTimeout(() => {
+            this.error = '';
+            this.cdr.detectChanges();
+          }, 2000);
+        }
+      });
   }
 
   addFavorite(artistId: string) {
@@ -166,20 +171,135 @@ export class Dashboard implements OnInit {
     }
   }
 
-      onSearchChange() {
-        this.searchSubject.next(this.searchTerm);
-      }
-      goToArtist(id: string) {
-        this.router.navigate(['/artist', id]);
-      }
-      goToAlbum(id: string) {
-        this.router.navigate(['/album', id]);
-      }
+  onSearchChange() {
+    this.searchSubject.next(this.searchTerm);
+  }
+  goToArtist(id: string) {
+    this.router.navigate(['/artist', id]);
+  }
+  goToAlbum(id: string) {
+    this.router.navigate(['/album', id]);
+  }
 
-      logout() {
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('token');
+  loadNotifications() {
+
+    this.http.get('http://localhost:3000/notifications', {
+      headers: this.getAuthHeaders()
+    })
+
+      .subscribe({
+
+        next: (res: any) => {
+          this.notifications = res;
+          this.cdr.detectChanges();
+        },
+
+        error: (err) => {
+          console.error('Erro ao carregar notificações:', err);
         }
-        this.router.navigate(['/login']);
-      }
+
+      });
+  }
+
+  toggleNotifications() {
+
+    this.isNotifOpen = !this.isNotifOpen;
+
+    if (this.isNotifOpen) {
+
+      this.notifications.forEach(n => {
+
+        if (!n.read) {
+
+          this.http.patch(
+            `http://localhost:3000/notifications/${n._id}/read`,
+            {},
+            {
+              headers: this.getAuthHeaders()
+            }
+          ).subscribe();
+
+          n.read = true;
+        }
+
+      });
+
     }
+
+    this.cdr.detectChanges();
+  }
+
+  deleteNotification(id: string) {
+
+    this.http.delete(
+      `http://localhost:3000/notifications/${id}`,
+      {
+        headers: this.getAuthHeaders()
+      }
+    )
+
+      .subscribe({
+
+        next: () => {
+
+          this.notifications =
+            this.notifications.filter(n => n._id !== id);
+
+          this.cdr.detectChanges();
+        },
+
+        error: (err) => {
+          console.error('Erro ao remover notificação:', err);
+        }
+
+      });
+  }
+
+  clearNotifications() {
+
+    this.http.delete(
+      `http://localhost:3000/notifications`,
+      {
+        headers: this.getAuthHeaders()
+      }
+    )
+
+      .subscribe({
+
+        next: () => {
+
+          this.notifications = [];
+          this.cdr.detectChanges();
+        },
+
+        error: (err) => {
+          console.error('Erro ao limpar notificações:', err);
+        }
+
+      });
+  }
+
+  getUnreadCount(): number {
+
+    return this.notifications.filter(n => !n.read).length;
+  }
+
+  goToNotificationAlbum(notification: any) {
+
+    const albumId = notification.request?.album?._id;
+
+    if (albumId) {
+
+      this.isNotifOpen = false;
+
+      this.router.navigate(['/album', albumId]);
+    }
+  }
+
+  logout() {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('token');
+    }
+    this.router.navigate(['/login']);
+  }
+}

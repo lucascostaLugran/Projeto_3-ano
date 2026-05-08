@@ -225,3 +225,42 @@
   z-index: 2000;
   border: 1px solid #2a2a3a;
 }
+
+.filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 28px;
+  background: #16161f;
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid #2a2a3a;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.25);
+}
+
+.filters button {
+  background: transparent;
+  border: 1px solid transparent;
+  color: #94a1b2;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filters button:hover {
+  background: #232336;
+  color: white;
+}
+
+.filters button.active {
+  background: #7f5af0;
+  color: white;
+  border-color: #7f5af0;
+  box-shadow: 0 0 10px rgba(127, 90, 240, 0.35);
+}
+
+.filters button.active:hover {
+  background: #9270ff;
+}

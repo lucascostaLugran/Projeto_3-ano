@@ -3,7 +3,7 @@
 ## Requisitos
 
 * Node.js
-* MongoDB
+* MongoDB Compass
 
 ---
 
@@ -37,14 +37,10 @@ Aplicação disponível em: http://localhost:4200
 
 De acordo com o enunciado, deveria ser fornecido um script ou rota para inicializar automaticamente a base de dados com dados de exemplo (artistas, álbuns, etc.).
 
-No entanto, devido a limitações de tempo durante o desenvolvimento do projeto, essa funcionalidade não foi implementada.
-
-Ainda assim, a aplicação encontra-se totalmente funcional, sendo possível testar todas as funcionalidades através da base de dados atualmente associada ao projeto.
-
+Pela forma como o nosso código está estruturado, utilizando a SpotifyAPI for Developers, para ir buscar diversas informações dos artistas como os seus álbuns, fotos de perfil, músicas e capas de projetos, a utilização do nosso .env torna-se praticamente necessária, pois apenas com a informação do SpotifyAPI nela presente se torna possível fazer coisas como adicionar artistas e álbuns.
 ---
 
 ## Observações
 
 * A aplicação depende de uma base de dados MongoDB ativa
-* O ficheiro `.env` já contém a configuração necessária
-* Por um motivo desconhecido o nosso logo deixou de aparecer na API 5 min antes da hora da entrega
+* O ficheiro `.env` contém o link para a base de dados usada pelo grupo.

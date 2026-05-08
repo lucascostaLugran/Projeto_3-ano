@@ -47,7 +47,7 @@ exports.getUserRequests = async (req, res) => {
     if (status) filter.status = status;
 
     const requests = await Request.find(filter)
-      .populate('album', 'title')
+      .populate('album', 'title imageUrl')
       .sort({ createdAt: -1 });
 
     res.json(requests);

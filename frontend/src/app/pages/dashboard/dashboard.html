@@ -6,7 +6,7 @@
     </div>
     <button routerLink="/dashboard">🏠 Home</button>
     <button routerLink="/collection">📚 Coleção</button>
-    <button routerLink="/notifications">🔔 Notificações</button>
+    <button routerLink="/request">📨 Pedidos</button>
 
     <div class="sidebar-bottom">
       <button class="user-display" routerLink="/profile">
@@ -20,6 +20,71 @@
 
     <div *ngIf="message || error" class="toast-global" [ngClass]="{ 'error': error }">
       {{ error || message }}
+    </div>
+
+    <div class="top-bar">
+
+      <div class="notification-wrapper">
+
+        <button class="notif-bell" (click)="toggleNotifications()">
+          🔔
+
+          <span *ngIf="getUnreadCount() > 0" class="notif-dot">
+            {{ getUnreadCount() }}
+          </span>
+
+        </button>
+
+        <div class="notif-dropdown" *ngIf="isNotifOpen">
+
+          <div class="notif-dropdown-header">
+
+            <span>Notificações</span>
+
+            <button *ngIf="notifications.length > 0" class="clear-all-btn" (click)="clearNotifications()">
+              Limpar tudo
+            </button>
+
+          </div>
+
+          <div *ngIf="notifications.length === 0" class="notif-empty">
+            Sem notificações.
+          </div>
+
+          <div *ngFor="let n of notifications" class="notif-item">
+
+            <div class="notif-item-body" (click)="goToNotificationAlbum(n)">
+
+              <img *ngIf="n.request?.album?.imageUrl" [src]="n.request.album.imageUrl" class="notif-cover" />
+
+              <div class="notif-content">
+
+                <span class="notif-title">
+                  {{ n.request?.album?.title || 'Álbum desconhecido' }}
+                </span>
+
+                <span class="notif-text">
+                  {{ n.message }}
+                </span>
+
+                <span class="notif-time">
+                  {{ n.createdAt | date:'dd/MM/yyyy HH:mm' }}
+                </span>
+
+              </div>
+
+            </div>
+
+            <button class="delete-notif-btn" (click)="deleteNotification(n._id)">
+              ✕
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
     </div>
 
     <h1>Dashboard</h1>
@@ -40,71 +105,49 @@
     </div>
 
     <div class="results">
-      <div 
-      *ngFor="let artist of artists" 
-      class="artist-card"
-      (click)="goToArtist(artist._id)"
-    >
-    
-      <div class="artist-row">
-    
-        <img 
-          *ngIf="artist.imageUrl"
-          [src]="artist.imageUrl"
-          class="artist-image"
-          alt="artist"
-        />
-    
-        <div class="artist-meta">
-    
-          <h3 class="artist-name">
-            {{ artist.name }}
-          </h3>
-    
-          <button 
-            class="fav-btn"
-            (click)="addFavorite(artist._id); $event.stopPropagation()"
-          >
-            Favorito
-          </button>
-    
+      <div *ngFor="let artist of artists" class="artist-card" (click)="goToArtist(artist._id)">
+
+        <div class="artist-row">
+
+          <img *ngIf="artist.imageUrl" [src]="artist.imageUrl" class="artist-image" alt="artist" />
+
+          <div class="artist-meta">
+
+            <h3 class="artist-name">
+              {{ artist.name }}
+            </h3>
+
+            <button class="fav-btn" (click)="addFavorite(artist._id); $event.stopPropagation()">
+              Favorito
+            </button>
+
+          </div>
+
         </div>
-    
+
       </div>
-    
-    </div>
-    <div 
-  *ngFor="let album of albums" 
-  class="album-card"
-  (click)="goToAlbum(album._id)"
->
+      <div *ngFor="let album of albums" class="album-card" (click)="goToAlbum(album._id)">
 
-  <div class="album-row">
+        <div class="album-row">
 
-    <img 
-      *ngIf="album.imageUrl"
-      [src]="album.imageUrl"
-      class="album-image"
-      alt="album"
-    />
+          <img *ngIf="album.imageUrl" [src]="album.imageUrl" class="album-image" alt="album" />
 
-    <div class="album-meta">
+          <div class="album-meta">
 
-      <h3 class="album-title">
-        {{ album.title }}
-      </h3>
+            <h3 class="album-title">
+              {{ album.title }}
+            </h3>
 
-      <p class="album-artist">
-        {{ album.artist?.name || 'Vários Artistas' }}
-      </p>
+            <p class="album-artist">
+              {{ album.artist?.name || 'Vários Artistas' }}
+            </p>
 
-    </div>
+          </div>
 
-    <div class="album-year">
-      {{ album.year }}
-    </div>
+          <div class="album-year">
+            {{ album.year }}
+          </div>
 
-  </div>
+        </div>
 
-</div>
-
+      </div>

@@ -2,22 +2,25 @@ import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-notifications',
+  selector: 'app-requests',
   standalone: true,
-  imports: [CommonModule, RouterModule],
-  templateUrl: './notifications.html',
-  styleUrls: ['./notifications.css']
+  imports: [CommonModule, RouterModule, FormsModule],
+  templateUrl: './request.html',
+  styleUrls: ['./request.css']
 })
-export class Notifications implements OnInit {
+export class Requests implements OnInit {
 
   private http = inject(HttpClient);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
 
   user: any = { username: '' };
-  notifications: any[] = [];
+  requests: any[] = [];
+  filteredRequests: any[] = [];
+  selectedStatus: string = '';
   message = '';
   token = '';
 
@@ -32,7 +35,7 @@ export class Notifications implements OnInit {
     }
 
     this.loadUserProfile();
-    this.loadNotifications();
+    this.loadRequests();
   }
 
   loadUserProfile() {
@@ -46,40 +49,46 @@ export class Notifications implements OnInit {
     });
   }
 
-  loadNotifications() {
-    this.http.get('http://localhost:3000/notifications', {
+  loadRequests() {
+    this.http.get('http://localhost:3000/requests', {
       headers: { Authorization: `Bearer ${this.token}` }
     }).subscribe({
       next: (res: any) => {
-        this.notifications = res;
+        this.requests = res;
+        this.filteredRequests = res;
         this.cdr.detectChanges();
       },
-      error: (err) => console.error('Erro ao carregar notificações:', err)
+      error: (err) => console.error('Erro ao carregar pedidos:', err)
     });
   }
 
-  markAsRead(id: string) {
-    this.http.patch(`http://localhost:3000/notifications/${id}/read`, {}, {
-      headers: { Authorization: `Bearer ${this.token}` }
-    }).subscribe({
-      next: () => {
-        const notif = this.notifications.find(n => n._id === id);
-        if (notif) notif.read = true;
-        this.cdr.detectChanges();
-      }
-    });
+  filterByStatus(status: string) {
+    this.selectedStatus = status;
+    if (!status) {
+      this.filteredRequests = this.requests;
+    } else {
+      this.filteredRequests = this.requests.filter(r => r.status === status);
+    }
+    this.cdr.detectChanges();
   }
 
-  goToAlbum(notification: any) {
-    this.markAsRead(notification._id);
-    const albumId = notification.request?.album;
+  goToAlbum(request: any) {
+    const albumId = request.album?._id;
     if (albumId) {
       this.router.navigate(['/album', albumId]);
     }
   }
 
-  isAccepted(notification: any): boolean {
-    return notification.request?.status === 'aceite';
+  getStatusLabel(status: string): string {
+    if (status === 'aceite') return '✅ Aceite';
+    if (status === 'recusado') return '❌ Recusado';
+    return '🕐 Em análise';
+  }
+
+  getFormatIcon(format: string): string {
+    if (format === 'CD') return '💿';
+    if (format === 'Vinyl') return '📀';
+    return '📼';
   }
 
   logout() {
