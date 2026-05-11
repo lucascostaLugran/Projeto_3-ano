@@ -124,7 +124,6 @@ exports.updateProfile = async (req, res) => {
     if (birthDate) user.birthDate = new Date(birthDate);
 
     if (password) {
-
       if (!currentPassword) {
         return res.status(400).json({ message: "Password atual é obrigatória" });
       }
@@ -147,6 +146,7 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({ message: "Erro no servidor" });
   }
 };
+
 exports.addFavoriteArtist = async (req, res) => {
   try {
     const user = await User.findById(req.userId);
@@ -244,13 +244,10 @@ exports.getCollection = async (req, res) => {
         year: album?.year,
         artist: album?.artist?.name || 'Vários Artistas',
         artistId: album?.artist?._id,
-      
-        imageUrl: album?.imageUrl,   
-      
+        imageUrl: album?.imageUrl,
         ean13: item.ean13,
         format: version?.format || 'N/A',
         description: version?.description || '',
-      
         addedAt: item.addedAt
       };
     });
@@ -262,6 +259,7 @@ exports.getCollection = async (req, res) => {
     res.status(500).json({ message: "Erro ao buscar coleção" });
   }
 };
+
 exports.removeFromCollection = async (req, res) => {
   try {
     const { albumId, ean13 } = req.body;
@@ -283,5 +281,256 @@ exports.removeFromCollection = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Erro ao remover da coleção" });
+  }
+};
+
+exports.createList = async (req, res) => {
+  try {
+    const { name } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ message: "Nome da lista é obrigatório" });
+    }
+
+    if (name.length > 100) {
+      return res.status(400).json({
+        message: "O nome da lista não pode ter mais de 100 caracteres"
+      });
+    }
+
+    const user = await User.findById(req.userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "Utilizador não encontrado" });
+    }
+
+    const existingList = user.lists.find(
+      l => l.name.toLowerCase() === name.trim().toLowerCase()
+    );
+
+    if (existingList) {
+      return res.status(400).json({
+        message: "Já tens uma lista com esse nome"
+      });
+    }
+
+    user.lists.push({
+      name: name.trim()
+    });
+
+    await user.save();
+
+    res.status(201).json({
+      message: "Lista criada com sucesso"
+    });
+
+  } catch (error) {
+    console.error("CREATE LIST ERROR:", error);
+    res.status(500).json({ message: "Erro no servidor" });
+  }
+};
+exports.getLists = async (req, res) => {
+  try {
+    const { sortBy = "updatedAt", order = "desc" } = req.query;
+
+    const user = await User.findById(req.userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "Utilizador não encontrado" });
+    }
+
+    let lists = user.lists.map(list => ({
+      _id: list._id,
+      name: list.name,
+      albumCount: list.albums.length,
+      updatedAt: list.updatedAt,
+
+      albums: list.albums.map(a => ({
+        album: a.album.toString(), 
+        addedAt: a.addedAt
+      }))
+    }));
+
+
+    if (!lists.length) {
+      return res.json([]);
+    }
+
+    lists.sort((a, b) => {
+      if (sortBy === "name") {
+        return order === "asc"
+          ? a.name.localeCompare(b.name)
+          : b.name.localeCompare(a.name);
+      }
+
+      if (sortBy === "albumCount") {
+        return order === "asc"
+          ? a.albumCount - b.albumCount
+          : b.albumCount - a.albumCount;
+      }
+
+      return order === "asc"
+        ? new Date(a.updatedAt) - new Date(b.updatedAt)
+        : new Date(b.updatedAt) - new Date(a.updatedAt);
+    });
+
+    res.json(lists);
+
+  } catch (error) {
+    console.error("GET LISTS ERROR:", error);
+    res.status(500).json({ message: "Erro ao buscar listas" });
+  }
+};
+exports.deleteList = async (req, res) => {
+  try {
+    const { listId } = req.params;
+
+    const user = await User.findById(req.userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "Utilizador não encontrado" });
+    }
+
+    const list = user.lists.id(listId);
+
+    if (!list) {
+      return res.status(404).json({ message: "Lista não encontrada" });
+    }
+
+    list.deleteOne(); 
+
+    await user.save();
+
+    res.json({ message: "Lista removida com sucesso" });
+
+  } catch (error) {
+    console.error("DELETE LIST ERROR:", error);
+    res.status(500).json({ message: "Erro ao remover lista" });
+  }
+};
+exports.addAlbumToList = async (req, res) => {
+  try {
+    const { listId } = req.params;
+    const { albumId } = req.body;
+
+    const user = await User.findById(req.userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "Utilizador não encontrado" });
+    }
+
+    const list = user.lists.find(
+      l => l._id.toString() === listId
+    );
+
+    if (!list) {
+      return res.status(404).json({ message: "Lista não encontrada" });
+    }
+
+    const alreadyExists = list.albums.find(
+      a => a.album.toString() === albumId
+    );
+
+    if (alreadyExists) {
+      return res.status(400).json({
+        message: "Álbum já está na lista"
+      });
+    }
+
+    list.albums.push({
+      album: albumId,
+      addedAt: new Date()
+    });
+
+    await user.save();
+
+    res.json({ message: "Álbum adicionado à lista" });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erro no servidor" });
+  }
+};
+
+exports.getListById = async (req, res) => {
+  try {
+    const { listId } = req.params;
+
+    const user = await User.findById(req.userId)
+      .populate({
+        path: "lists.albums.album",
+        populate: {
+          path: "artist",
+          select: "name"
+        }
+      });
+
+    if (!user) {
+      return res.status(404).json({ message: "Utilizador não encontrado" });
+    }
+
+    const list = user.lists.find(
+      l => l._id.toString() === listId
+    );
+
+    if (!list) {
+      return res.status(404).json({ message: "Lista não encontrada" });
+    }
+
+    const formatted = {
+      _id: list._id,
+      name: list.name,
+      albums: list.albums.map(item => ({
+        albumId: item.album?._id,
+        title: item.album?.title,
+        artist: item.album?.artist?.name || 'Vários Artistas',
+        artistId: item.album?.artist?._id,
+        imageUrl: item.album?.imageUrl,
+        addedAt: item.addedAt
+      }))
+    };
+
+    res.json(formatted);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Erro ao buscar lista" });
+  }
+};
+exports.removeAlbumFromList = async (req, res) => {
+  try {
+    const { listId, albumId } = req.params;
+
+    const user = await User.findById(req.userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "Utilizador não encontrado" });
+    }
+
+    const list = user.lists.find(
+      l => l._id.toString() === listId
+    );
+
+    if (!list) {
+      return res.status(404).json({ message: "Lista não encontrada" });
+    }
+
+    const initialLength = list.albums.length;
+
+    list.albums = list.albums.filter(
+      a => a.album.toString() !== albumId
+    );
+
+    if (list.albums.length === initialLength) {
+      return res.status(404).json({ message: "Álbum não encontrado na lista" });
+    }
+
+    await user.save();
+
+    res.json({ message: "Álbum removido da lista com sucesso" });
+
+  } catch (err) {
+    console.error("REMOVE ALBUM ERROR:", err);
+    res.status(500).json({ message: "Erro ao remover álbum" });
   }
 };

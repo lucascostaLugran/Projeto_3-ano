@@ -9,13 +9,15 @@
     <button routerLink="/dashboard">🏠 Home</button>
     <button routerLink="/collection">📚 Coleção</button>
     <button routerLink="/request">📨 Pedidos</button>
+    <button routerLink="/lists">📂 Listas</button>
+
     <div class="sidebar-bottom">
       <button class="user-display" routerLink="/profile">
         👤 {{ user?.username || 'Perfil' }}
       </button>
-
       <button (click)="logout()">⏻ Logout</button>
     </div>
+
   </div>
 
   <div class="main" *ngIf="album">
@@ -54,6 +56,24 @@
             {{ album.year }} | {{ album.type | uppercase }}
           </p>
 
+          <div class="list-controls">
+
+            <select class="list-select" [(ngModel)]="selectedListId">
+              <option value="" disabled selected>Selecionar lista</option>
+              <option *ngFor="let list of lists" [value]="list._id">
+                {{ list.name }}
+              </option>
+            </select>
+
+            <button 
+              class="list-add-btn"
+              (click)="addToList()"
+              [disabled]="!selectedListId">
+              ➕ Adicionar à lista
+            </button>
+
+          </div>
+
         </div>
 
       </div>
@@ -76,8 +96,7 @@
 
       </div>
 
-      <div
-        style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
         <h2 class="section-title" style="margin: 0; border: none; padding: 0;">
           Versões Disponíveis
         </h2>
@@ -108,7 +127,6 @@
               <ng-container *ngIf="isInCollection(v.ean13)">
                 <span>✅</span>
               </ng-container>
-
             </button>
 
             <div class="version-description" *ngIf="v.description">
@@ -129,7 +147,6 @@
 
   </div>
 
-  <!-- Modal de pedido de versão -->
   <div class="modal-overlay" *ngIf="isRequestModalOpen">
     <div class="modal">
 
@@ -155,15 +172,12 @@
 
       <div class="input-group">
         <select [(ngModel)]="requestData.description" [disabled]="!requestData.format">
-
           <option value="" disabled>
             Designação
           </option>
-
           <option *ngFor="let version of filteredDescriptions" [value]="version.description">
             {{ version.description }}
           </option>
-
         </select>
       </div>
 

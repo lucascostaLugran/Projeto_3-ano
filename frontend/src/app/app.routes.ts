@@ -6,7 +6,9 @@ import { Profile } from './pages/profile/profile';
 import { ArtistProfile } from './pages/artist-profile/artist-profile';
 import { AlbumProfile } from './pages/album-profile/album-profile';
 import { Collection } from './pages/collection/collection';
-import { Requests} from './pages/request/request';
+import { Requests } from './pages/request/request';
+import { Lists } from './pages/lists/lists';
+import { ListDetail } from './pages/lists-details/list-detail';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -15,8 +17,12 @@ export const routes: Routes = [
   { path: 'profile', component: Profile },
   { path: 'request', component: Requests },
   { path: 'artist/:id', component: ArtistProfile },
-  { path: 'album/:id', component: AlbumProfile }, 
-  { path: 'collection', component: Collection }, 
+  { path: 'album/:id', component: AlbumProfile },
+  { path: 'collection', component: Collection },
+
+  { path: 'lists', component: Lists },
+  { path: 'lists/:id', component: ListDetail },
+
   { path: '', redirectTo: 'login', pathMatch: 'full' },
-  { path: '**', redirectTo: 'login' } 
+  { path: '**', redirectTo: 'login' }
 ];

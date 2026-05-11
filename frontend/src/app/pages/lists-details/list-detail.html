@@ -1,0 +1,103 @@
+<div class="dashboard">
+
+    <div class="sidebar">
+  
+      <div class="logo-container">
+        <img src="/assets/logo.png" class="logo" />
+      </div>
+  
+      <button routerLink="/dashboard">🏠 Home</button>
+      <button routerLink="/collection">📚 Coleção</button>
+      <button routerLink="/request">📨 Pedidos</button>
+      <button routerLink="/lists">📂 Listas</button>
+  
+      <div class="sidebar-bottom">
+        <button class="user-display" routerLink="/profile">
+          👤 Perfil
+        </button>
+        <button (click)="logout()">⏻ Logout</button>
+      </div>
+  
+    </div>
+  
+    <div class="main" *ngIf="list">
+  
+      <div *ngIf="message" class="toast" [ngClass]="messageType">
+        {{ message }}
+      </div>
+  
+      <div class="artist-container">
+  
+        <h1 class="artist-name">
+          📂 {{ list.name }}
+        </h1>
+  
+        <div class="search-box">
+  
+          <select [(ngModel)]="sortBy" (change)="sortAlbums()">
+            <option value="title">Título</option>
+            <option value="artist">Artista</option>
+            <option value="addedAt">Data</option>
+          </select>
+  
+          <button (click)="changeSort(sortBy)">
+            {{ order === 'asc' ? 'Crescente ▲' : 'Descendente ▼' }}
+          </button>
+  
+        </div>
+  
+        <div *ngIf="list.albums.length === 0" class="empty">
+          Esta lista não tem álbuns
+        </div>
+  
+        <div class="albums">
+  
+          <div 
+            *ngFor="let album of list.albums"
+            class="album-card"
+            (click)="goToAlbum(album.albumId)"
+          >
+  
+            <div class="album-row">
+  
+              <img 
+                [src]="album.imageUrl || '/assets/placeholder.png'" 
+                class="album-image"
+              />
+  
+              <div class="album-meta">
+  
+                <div class="album-title">
+                  {{ album.title }}
+                </div>
+  
+                <div class="album-artist">
+                  {{ album.artist }}
+                </div>
+  
+                <div class="album-date">
+                  Adicionado em {{ album.addedAt | date:'short' }}
+                </div>
+  
+              </div>
+  
+              <div class="album-right">
+                <button 
+                  class="remove-btn"
+                  (click)="remove(album.albumId); $event.stopPropagation()"
+                >
+                  ✕
+                </button>
+              </div>
+  
+            </div>
+  
+          </div>
+  
+        </div>
+  
+      </div>
+  
+    </div>
+  
+  </div>

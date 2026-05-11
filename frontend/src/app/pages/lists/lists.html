@@ -1,0 +1,99 @@
+<div class="dashboard">
+
+  <div class="sidebar">
+    <div class="logo-container">
+      <img src="/assets/logo.png" class="logo" />
+    </div>
+
+    <button routerLink="/dashboard">🏠 Home</button>
+    <button routerLink="/collection">📚 Coleção</button>
+    <button routerLink="/request">📨 Pedidos</button>
+    <button routerLink="/lists">📂 Listas</button>
+
+    <div class="sidebar-bottom">
+      <button class="user-display" routerLink="/profile">
+        👤 {{ user?.username || 'Perfil' }}
+      </button>
+      <button (click)="logout()">⏻ Logout</button>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <div *ngIf="message || error" class="toast-global" [ngClass]="{ 'error': error }">
+      {{ error || message }}
+    </div>
+
+    <h1>📂 As Minhas Listas</h1>
+
+    <div class="search-box">
+
+      <div class="input-group">
+        <input [(ngModel)]="newListName" placeholder=" " />
+        <label>Nome da nova lista</label>
+      </div>
+
+      <button (click)="createList()">Criar</button>
+
+      <select [(ngModel)]="sortBy" (change)="loadLists()">
+        <option value="name">Nome</option>
+        <option value="albumCount">Álbuns</option>
+        <option value="updatedAt">Última modificação</option>
+      </select>
+
+      <button (click)="changeSort(sortBy)">
+        {{ order === 'asc' ? 'Crescente ▲' : 'Descendente ▼' }}
+      </button>
+
+    </div>
+
+    <div class="results">
+
+      <div 
+        *ngFor="let list of lists" 
+        class="artist-card"
+        (click)="goToList(list._id)"
+      >
+
+        <div class="card-left">
+
+          <div class="text-block">
+
+            <div class="artist-name">
+              📂 {{ list.name }}
+            </div>
+
+            <div class="meta-text">
+              {{ list.albumCount }} álbuns
+            </div>
+
+            <div class="meta-text">
+              {{ list.updatedAt | date:'short' }}
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="card-right">
+
+          <button 
+          class="remove-btn"
+          (click)="deleteList(list._id, $event)"
+        >
+          ✕
+        </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div *ngIf="lists.length === 0" class="empty">
+      Ainda não tens listas
+    </div>
+
+  </div>
+
+</div>

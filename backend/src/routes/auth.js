@@ -7,13 +7,13 @@ const {
   login, 
   getProfile, 
   updateProfile,
-  addFavoriteArtist,
-  removeFavoriteArtist,
-  addToCollection,
-  getCollection,
-  removeFromCollection   
+  createList,
+  getLists,
+  addAlbumToList,
+  getListById,
+  removeAlbumFromList,
+  deleteList
 } = require("../controllers/authController");
-
 
 router.post("/register", register);
 router.post("/login", login);
@@ -21,10 +21,13 @@ router.post("/login", login);
 router.get("/profile", authMiddleware, getProfile);
 router.put("/profile", authMiddleware, updateProfile);
 
-router.post("/favorite", authMiddleware, addFavoriteArtist);
-router.delete("/favorite", authMiddleware, removeFavoriteArtist);
+router.post("/lists", authMiddleware, createList);
+router.get("/lists", authMiddleware, getLists);
+router.get("/lists/:listId", authMiddleware, getListById);
 
-router.get("/collection", authMiddleware, getCollection);
-router.post("/collection", authMiddleware, addToCollection);
-router.delete("/collection", authMiddleware, removeFromCollection);
+router.post("/lists/:listId/add-album", authMiddleware, addAlbumToList);
+router.delete("/lists/:listId/:albumId", authMiddleware, removeAlbumFromList);
+
+router.delete("/lists/:listId", authMiddleware, deleteList);
+
 module.exports = router;
