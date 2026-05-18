@@ -7,17 +7,14 @@ exports.searchAlbums = async (req, res) => {
     if (!title) {
       return res.status(400).json({ message: "O título é obrigatório para a pesquisa." });
     }
-    const albums = await Album.find({ 
+    const albums = await Album.find({
       title: { $regex: title, $options: 'i' }
-    }).populate('artist', 'name'); 
-
+    }).populate('artist', 'name');
     if (albums.length === 0) {
-      return res.status(200).json({ message: "Nenhum álbum encontrado.", results: [] });
+      return res.status(404).json({ message: "Nenhum álbum encontrado." });
     }
-
     res.status(200).json(albums);
-  }
-  catch (error) {
+  } catch (error) {
     console.error("Search album error:", error);
     res.status(500).json({ message: "Erro ao realizar pesquisa." });
   }
@@ -26,11 +23,9 @@ exports.searchAlbums = async (req, res) => {
 exports.getAlbumById = async (req, res) => {
   try {
     const album = await Album.findById(req.params.id).populate('artist');
-    
     if (!album) {
       return res.status(404).json({ message: "Álbum não encontrado." });
     }
-
     res.status(200).json(album);
   } catch (error) {
     console.error("Get album detail error:", error);

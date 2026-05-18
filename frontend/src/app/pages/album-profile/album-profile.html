@@ -171,14 +171,8 @@
       </div>
 
       <div class="input-group">
-        <select [(ngModel)]="requestData.description" [disabled]="!requestData.format">
-          <option value="" disabled>
-            Designação
-          </option>
-          <option *ngFor="let version of filteredDescriptions" [value]="version.description">
-            {{ version.description }}
-          </option>
-        </select>
+        <input [(ngModel)]="requestData.description" [disabled]="!requestData.format" placeholder=" " />
+        <label>Designação</label>
       </div>
 
       <div class="modal-actions">

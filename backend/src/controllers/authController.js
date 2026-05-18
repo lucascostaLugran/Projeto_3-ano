@@ -195,8 +195,14 @@ exports.addToCollection = async (req, res) => {
     }
 
     const alreadyInCollection = user.collection.find(
-      item => item.album.toString() === albumId
+      item => item.album.toString() === albumId && item.ean13 === ean13
     );
+    
+    if (alreadyInCollection) {
+      return res.status(400).json({
+        message: "Já tens esta versão na tua coleção!"
+      });
+    }
 
     if (alreadyInCollection) {
       return res.status(400).json({

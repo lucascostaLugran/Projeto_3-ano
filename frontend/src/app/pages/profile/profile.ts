@@ -199,7 +199,7 @@ export class Profile {
 
     const token = localStorage.getItem('token');
 
-    this.http.delete('http://localhost:3000/auth/favorite', {
+    this.http.delete('http://localhost:3000/artists/favorite', {
       headers: {
         Authorization: `Bearer ${token}`
       }

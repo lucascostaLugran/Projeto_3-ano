@@ -20,8 +20,12 @@
 
   <div class="main">
 
-    <div *ngIf="message || error" class="toast-global" [ngClass]="{ 'error': error }">
-      {{ error || message }}
+    <div *ngIf="error" class="toast-global error">
+      {{ error }}
+    </div>
+
+    <div *ngIf="message" class="toast-global">
+      {{ message }}
     </div>
 
     <h1>📂 As Minhas Listas</h1>
@@ -33,17 +37,19 @@
         <label>Nome da nova lista</label>
       </div>
 
-      <button (click)="createList()">Criar</button>
+      <button class="primary-btn" (click)="createList()">Criar</button>
 
-      <select [(ngModel)]="sortBy" (change)="loadLists()">
-        <option value="name">Nome</option>
-        <option value="albumCount">Álbuns</option>
-        <option value="updatedAt">Última modificação</option>
-      </select>
+      <div class="filters">
+        <select [(ngModel)]="sortBy" (change)="loadLists()">
+          <option value="name">Nome</option>
+          <option value="albumCount">Álbuns</option>
+          <option value="updatedAt">Última modificação</option>
+        </select>
 
-      <button (click)="changeSort(sortBy)">
-        {{ order === 'asc' ? 'Crescente ▲' : 'Descendente ▼' }}
-      </button>
+        <button class="sort-btn" (click)="changeSort(sortBy)">
+          {{ order === 'asc' ? '▲' : '▼' }}
+        </button>
+      </div>
 
     </div>
 
@@ -55,36 +61,28 @@
         (click)="goToList(list._id)"
       >
 
-        <div class="card-left">
+        <div class="text-block">
 
-          <div class="text-block">
+          <div class="artist-name">
+            📂 {{ list.name }}
+          </div>
 
-            <div class="artist-name">
-              📂 {{ list.name }}
-            </div>
+          <div class="meta-text">
+            {{ list.albumCount }} álbuns
+          </div>
 
-            <div class="meta-text">
-              {{ list.albumCount }} álbuns
-            </div>
-
-            <div class="meta-text">
-              {{ list.updatedAt | date:'short' }}
-            </div>
-
+          <div class="meta-text">
+            {{ list.updatedAt | date:'short' }}
           </div>
 
         </div>
 
-        <div class="card-right">
-
-          <button 
+        <button 
           class="remove-btn"
           (click)="deleteList(list._id, $event)"
         >
           ✕
         </button>
-
-        </div>
 
       </div>
 

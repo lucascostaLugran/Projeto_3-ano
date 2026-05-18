@@ -5,21 +5,17 @@ const Notification = require("../models/Notification");
 exports.createRequest = async (req, res) => {
   try {
     const { albumId, ean13, format, description } = req.body;
-
     if (!albumId || !ean13 || !format) {
       return res.status(400).json({ message: "Album, EAN-13 e formato são obrigatórios" });
     }
-
     const album = await Album.findById(albumId);
     if (!album) {
       return res.status(404).json({ message: "Álbum não encontrado" });
     }
-
     const versionExists = album.versions.find(v => v.ean13 === ean13);
     if (versionExists) {
       return res.status(400).json({ message: "Esta versão já existe neste álbum" });
     }
-
     const request = await Request.create({
       user: req.userId,
       album: albumId,
@@ -27,12 +23,10 @@ exports.createRequest = async (req, res) => {
       format,
       description: description || ""
     });
-
     res.status(201).json({
       message: "Pedido submetido com sucesso",
       request
     });
-
   } catch (error) {
     console.error("Create request error:", error);
     res.status(500).json({ message: "Erro no servidor" });
@@ -42,16 +36,12 @@ exports.createRequest = async (req, res) => {
 exports.getUserRequests = async (req, res) => {
   try {
     const { status } = req.query;
-
     const filter = { user: req.userId };
     if (status) filter.status = status;
-
     const requests = await Request.find(filter)
       .populate('album', 'title imageUrl')
       .sort({ createdAt: -1 });
-
     res.json(requests);
-
   } catch (error) {
     console.error("Get requests error:", error);
     res.status(500).json({ message: "Erro no servidor" });
@@ -62,23 +52,18 @@ exports.updateRequest = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
-
     if (!['aceite', 'recusado'].includes(status)) {
       return res.status(400).json({ message: "Estado inválido" });
     }
-
     const request = await Request.findById(id);
     if (!request) {
       return res.status(404).json({ message: "Pedido não encontrado" });
     }
-
     if (request.status !== 'em análise') {
       return res.status(400).json({ message: "Este pedido já foi processado" });
     }
-
     request.status = status;
     await request.save();
-
     if (status === 'aceite') {
       await Album.findByIdAndUpdate(request.album, {
         $push: {
@@ -90,8 +75,7 @@ exports.updateRequest = async (req, res) => {
         }
       });
     }
-
-    await Notification.create({
+    const notification = await Notification.create({
       user: request.user,
       request: request._id,
       message: status === 'aceite'
@@ -99,8 +83,19 @@ exports.updateRequest = async (req, res) => {
         : `O teu pedido foi recusado`
     });
 
-    res.json({ message: "Pedido atualizado com sucesso", request });
+    const populated = await notification.populate({
+      path: 'request',
+      model: 'Request',
+      populate: {
+        path: 'album',
+        model: 'Album',
+        select: 'title imageUrl _id'
+      }
+    });
 
+    global.sendNotification(String(request.user), populated);
+
+    res.json({ message: "Pedido atualizado com sucesso", request });
   } catch (error) {
     console.error("Update request error:", error);
     res.status(500).json({ message: "Erro no servidor" });

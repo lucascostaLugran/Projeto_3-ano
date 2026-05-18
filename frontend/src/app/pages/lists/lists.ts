@@ -108,6 +108,7 @@ export class Lists implements OnInit {
       },
       error: (err: any) => {
         this.error = err.error?.message || 'Erro ao criar lista';
+        this.cdr.detectChanges();
 
         setTimeout(() => {
           this.error = '';

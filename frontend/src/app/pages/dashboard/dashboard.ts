@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -13,7 +13,7 @@ import { debounceTime } from 'rxjs/operators';
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css']
 })
-export class Dashboard implements OnInit {
+export class Dashboard implements OnInit, OnDestroy {
 
   user: any = {
     username: ''
@@ -34,6 +34,8 @@ export class Dashboard implements OnInit {
 
   isNotifOpen = false;
 
+  private ws: WebSocket | null = null;
+
   constructor(
     private http: HttpClient,
     private router: Router,
@@ -53,12 +55,37 @@ export class Dashboard implements OnInit {
 
     this.loadProfile();
     this.loadNotifications();
+    this.connectWebSocket();
 
     this.searchSubject.pipe(
       debounceTime(300)
     ).subscribe(() => {
       this.search();
     });
+  }
+
+  ngOnDestroy() {
+    if (this.ws) {
+      this.ws.close();
+    }
+  }
+
+  connectWebSocket() {
+    const payload = this.token.split('.')[1];
+    const decoded = JSON.parse(atob(payload));
+    const userId = decoded.id || decoded._id || decoded.userId;
+
+    this.ws = new WebSocket(`ws://localhost:3000/?userId=${userId}`);
+
+    this.ws.onmessage = (event) => {
+      const notification = JSON.parse(event.data);
+      this.notifications.unshift(notification);
+      this.cdr.detectChanges();
+    };
+
+    this.ws.onclose = () => {
+      setTimeout(() => this.connectWebSocket(), 3000);
+    };
   }
 
   getAuthHeaders() {
@@ -157,8 +184,11 @@ export class Dashboard implements OnInit {
       this.http.get(`http://localhost:3000/albums/search?title=${term}`)
         .subscribe({
           next: (res: any) => {
-            this.albums = res;
+            this.albums = Array.isArray(res) ? res : [];
             this.artists = [];
+            if (this.albums.length === 0) {
+              this.error = 'Nenhum álbum encontrado.';
+            }
             this.cdr.detectChanges();
           },
           error: (err: any) => {
