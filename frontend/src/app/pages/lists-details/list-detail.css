@@ -301,29 +301,48 @@
   }
   
   @media (max-width: 768px) {
-  
-    .dashboard {
-      flex-direction: column;
-    }
+    .dashboard { flex-direction: column; }
   
     .sidebar {
       width: 100%;
       min-width: unset;
       height: auto;
+      position: relative;
       flex-direction: row;
-      justify-content: space-between;
+      flex-wrap: wrap;
+      justify-content: flex-start;
       align-items: center;
       padding: 10px 15px;
+      gap: 6px;
     }
   
-    .logo {
-      width: 120px;
-      margin: 0;
+    .logo-container {
+      position: relative;
+      width: auto;
+      top: unset;
+      left: unset;
+      margin-right: 10px;
     }
   
-    .main {
-      padding: 20px;
-    }
-
+    .logo { width: 80px; margin: 0; }
   
+    .sidebar button {
+      width: auto;
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+  
+    .sidebar-bottom {
+      flex-direction: row;
+      border-top: none;
+      padding-top: 0;
+      margin-top: 0;
+      gap: 6px;
+    }
+  
+    .main { padding: 16px; }
+  
+    .album-row { flex-wrap: wrap; }
+    .album-image { width: 55px; height: 55px; }
+    .search-box { flex-wrap: wrap; }
   }

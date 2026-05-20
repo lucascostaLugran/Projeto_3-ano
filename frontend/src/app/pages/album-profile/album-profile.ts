@@ -172,7 +172,7 @@ export class AlbumProfile implements OnInit {
         setTimeout(() => {
           this.message = '';
           this.cdr.detectChanges();
-        }, 2000);
+        }, 4000);
       },
       error: (err: any) => {
         this.message = err.error?.message || 'Erro ao adicionar';
@@ -181,7 +181,7 @@ export class AlbumProfile implements OnInit {
         setTimeout(() => {
           this.message = '';
           this.cdr.detectChanges();
-        }, 2000);
+        }, 4000);
       }
     });
   }
@@ -209,7 +209,7 @@ export class AlbumProfile implements OnInit {
         setTimeout(() => {
           this.message = '';
           this.cdr.detectChanges();
-        }, 2000);
+        }, 4000);
       },
       error: (err: any) => {
         this.message = err.error?.message || 'Erro ao adicionar à lista';
@@ -220,7 +220,7 @@ export class AlbumProfile implements OnInit {
         setTimeout(() => {
           this.message = '';
           this.cdr.detectChanges();
-        }, 2000);
+        }, 4000);
       }
     });
   }
@@ -236,14 +236,14 @@ export class AlbumProfile implements OnInit {
     if (!this.requestData.ean13 || !this.requestData.format) {
       this.requestError = 'EAN-13 e formato são obrigatórios';
       this.cdr.detectChanges();
-      setTimeout(() => { this.requestError = ''; this.cdr.detectChanges(); }, 2000);
+      setTimeout(() => { this.requestError = ''; this.cdr.detectChanges(); }, 4000);
       return;
     }
 
     if (!/^\d{13}$/.test(this.requestData.ean13)) {
       this.requestError = 'EAN-13 deve ter exatamente 13 dígitos';
       this.cdr.detectChanges();
-      setTimeout(() => { this.requestError = ''; this.cdr.detectChanges(); }, 2000);
+      setTimeout(() => { this.requestError = ''; this.cdr.detectChanges(); }, 4000);
       return;
     }
 
@@ -264,7 +264,7 @@ export class AlbumProfile implements OnInit {
           this.isRequestModalOpen = false;
           this.requestMessage = '';
           this.cdr.detectChanges();
-        }, 2000);
+        }, 4000);
       },
       error: (err: any) => {
         this.requestError = err.error?.message || 'Erro ao submeter pedido';

@@ -104,7 +104,7 @@ export class Lists implements OnInit {
         setTimeout(() => {
           this.message = '';
           this.cdr.detectChanges();
-        }, 2000);
+        }, 4000);
       },
       error: (err: any) => {
         this.error = err.error?.message || 'Erro ao criar lista';
@@ -113,7 +113,7 @@ export class Lists implements OnInit {
         setTimeout(() => {
           this.error = '';
           this.cdr.detectChanges();
-        }, 2000);
+        }, 4000);
       }
     });
   }
@@ -134,7 +134,7 @@ export class Lists implements OnInit {
         setTimeout(() => {
           this.message = '';
           this.cdr.detectChanges();
-        }, 2000);
+        }, 4000);
       },
       error: () => {
         this.error = 'Erro ao remover lista';
@@ -142,7 +142,7 @@ export class Lists implements OnInit {
         setTimeout(() => {
           this.error = '';
           this.cdr.detectChanges();
-        }, 2000);
+        }, 4000);
       }
     });
   }

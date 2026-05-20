@@ -1,6 +1,5 @@
 <div class="dashboard">
   <div class="sidebar">
-
     <div class="logo-container">
       <img src="/assets/logo.png" class="logo" alt="Sonexa logo" />
     </div>
@@ -8,7 +7,6 @@
     <button routerLink="/collection">📚 Coleção</button>
     <button routerLink="/request">📨 Pedidos</button>
     <button routerLink="/lists">📂 Listas</button>
-
     <div class="sidebar-bottom">
       <button class="user-display" routerLink="/profile">
         👤 {{ user.username }}
@@ -24,131 +22,146 @@
     </div>
 
     <div class="top-bar">
-
       <div class="notification-wrapper">
-
         <button class="notif-bell" (click)="toggleNotifications()">
           🔔
-
           <span *ngIf="getUnreadCount() > 0" class="notif-dot">
             {{ getUnreadCount() }}
           </span>
-
         </button>
-
         <div class="notif-dropdown" *ngIf="isNotifOpen">
-
           <div class="notif-dropdown-header">
-
             <span>Notificações</span>
-
             <button *ngIf="notifications.length > 0" class="clear-all-btn" (click)="clearNotifications()">
               Limpar tudo
             </button>
-
           </div>
-
           <div *ngIf="notifications.length === 0" class="notif-empty">
             Sem notificações.
           </div>
-
           <div *ngFor="let n of notifications" class="notif-item">
-
             <div class="notif-item-body" (click)="goToNotificationAlbum(n)">
-
               <img *ngIf="n.request?.album?.imageUrl" [src]="n.request.album.imageUrl" class="notif-cover" />
-
               <div class="notif-content">
-
-                <span class="notif-title">
-                  {{ n.request?.album?.title || 'Álbum desconhecido' }}
-                </span>
-
-                <span class="notif-text">
-                  {{ n.message }}
-                </span>
-
-                <span class="notif-time">
-                  {{ n.createdAt | date:'dd/MM/yyyy HH:mm' }}
-                </span>
-
+                <span class="notif-title">{{ n.request?.album?.title || 'Álbum desconhecido' }}</span>
+                <span class="notif-text">{{ n.message }}</span>
+                <span class="notif-time">{{ n.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
               </div>
-
             </div>
-
-            <button class="delete-notif-btn" (click)="deleteNotification(n._id)">
-              ✕
-            </button>
-
+            <button class="delete-notif-btn" (click)="deleteNotification(n._id)">✕</button>
           </div>
-
         </div>
+      </div>
+    </div>
 
+    <h1>Olá, {{ user.username }} 👋</h1>
+    <p class="subtitle">O que queres fazer hoje?</p>
+
+    <div class="quick-cards">
+
+      <div class="qcard" (click)="router.navigate(['/collection'])">
+        <div class="qcard-header">
+          <span class="qcard-icon">📚</span>
+          <span class="qcard-title">A Minha Coleção</span>
+        </div>
+        <div class="qcard-body" *ngIf="lastCollectionAlbum; else noCollection">
+          <img [src]="lastCollectionAlbum.imageUrl || '/assets/placeholder.png'" class="qcard-img" />
+          <div class="qcard-meta">
+            <div class="qcard-meta-title">{{ lastCollectionAlbum.title }}</div>
+            <div class="qcard-meta-sub">{{ lastCollectionAlbum.artist }}</div>
+            <div class="qcard-meta-tag">Último adicionado</div>
+          </div>
+        </div>
+        <ng-template #noCollection>
+          <div class="qcard-empty">Ainda não tens álbuns na coleção</div>
+        </ng-template>
+      </div>
+
+      <div class="qcard" (click)="router.navigate(['/lists'])">
+        <div class="qcard-header">
+          <span class="qcard-icon">📂</span>
+          <span class="qcard-title">As Minhas Listas</span>
+        </div>
+        <div class="qcard-body" *ngIf="topList; else noLists">
+          <div class="qcard-meta">
+            <div class="qcard-meta-title">{{ topList.name }}</div>
+            <div class="qcard-meta-sub">{{ topList.albumCount }} álbuns</div>
+            <div class="qcard-meta-tag">Lista com mais álbuns</div>
+          </div>
+        </div>
+        <ng-template #noLists>
+          <div class="qcard-empty">Ainda não tens listas criadas</div>
+        </ng-template>
+      </div>
+
+      <div class="qcard" (click)="router.navigate(['/request'])">
+        <div class="qcard-header">
+          <span class="qcard-icon">📨</span>
+          <span class="qcard-title">Pedidos</span>
+        </div>
+        <div class="qcard-body">
+          <div class="qcard-meta">
+            <div class="qcard-meta-title">{{ pendingRequestsCount }} pedido{{ pendingRequestsCount !== 1 ? 's' : '' }}</div>
+            <div class="qcard-meta-sub">de novas versões de álbuns</div>
+            <div class="qcard-meta-tag">Ver todos os pedidos</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="qcard" (click)="router.navigate(['/profile'])">
+        <div class="qcard-header">
+          <span class="qcard-icon">👤</span>
+          <span class="qcard-title">O Meu Perfil</span>
+        </div>
+        <div class="qcard-body">
+          <div class="qcard-meta">
+            <div class="qcard-meta-title">{{ user.username }}</div>
+            <div class="qcard-meta-sub">{{ user.email }}</div>
+            <div class="qcard-meta-tag">Gerir perfil</div>
+          </div>
+        </div>
       </div>
 
     </div>
 
-    <h1>Dashboard</h1>
-
-    <div class="search-box">
-      <select [(ngModel)]="searchType"
-        style="padding: 10px; border-radius: 10px; background: #cfd6e1; border:none; margin-right: 5px;">
-        <option value="artist">Artistas</option>
-        <option value="album">Álbuns</option>
-      </select>
-
-      <div class="input-group">
-        <input type="text" placeholder=" " [(ngModel)]="searchTerm" (input)="onSearchChange()" />
-        <label>Pesquisar {{ searchType === 'artist' ? 'artistas' : 'álbuns' }}...</label>
+    <div class="search-section">
+      <h2 class="section-title">🔍 Pesquisar</h2>
+      <div class="search-box">
+        <select [(ngModel)]="searchType" (change)="artists = []; albums = []">
+          <option value="artist">Artistas</option>
+          <option value="album">Álbuns</option>
+        </select>
+        <div class="input-group">
+          <input type="text" placeholder=" " [(ngModel)]="searchTerm" (input)="onSearchChange()" />
+          <label>Pesquisar {{ searchType === 'artist' ? 'artistas' : 'álbuns' }}...</label>
+        </div>
+        <button type="button" (click)="search()">Pesquisar</button>
       </div>
-
-      <button type="button" (click)="search()">Pesquisar</button>
     </div>
 
     <div class="results">
       <div *ngFor="let artist of artists" class="artist-card" (click)="goToArtist(artist._id)">
-
         <div class="artist-row">
-
           <img *ngIf="artist.imageUrl" [src]="artist.imageUrl" class="artist-image" alt="artist" />
-
           <div class="artist-meta">
-
-            <h3 class="artist-name">
-              {{ artist.name }}
-            </h3>
-
+            <h3 class="artist-name">{{ artist.name }}</h3>
             <button class="fav-btn" (click)="addFavorite(artist._id); $event.stopPropagation()">
               Favorito
             </button>
-
           </div>
-
         </div>
-
       </div>
       <div *ngFor="let album of albums" class="album-card" (click)="goToAlbum(album._id)">
-
         <div class="album-row">
-
           <img *ngIf="album.imageUrl" [src]="album.imageUrl" class="album-image" alt="album" />
-
           <div class="album-meta">
-
-            <h3 class="album-title">
-              {{ album.title }}
-            </h3>
-
-            <p class="album-artist">
-              {{ album.artist?.name || 'Vários Artistas' }}
-            </p>
-
+            <h3 class="album-title">{{ album.title }}</h3>
+            <p class="album-artist">{{ album.artist?.name || 'Vários Artistas' }}</p>
           </div>
-
-          <div class="album-year">
-            {{ album.year }}
-          </div>
-
+          <div class="album-year">{{ album.year }}</div>
         </div>
-
       </div>
+    </div>
+
+  </div>
+</div>

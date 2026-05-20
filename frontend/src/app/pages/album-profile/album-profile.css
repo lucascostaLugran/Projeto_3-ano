@@ -414,9 +414,7 @@
 }
 
 @media (max-width: 768px) {
-  .dashboard {
-    flex-direction: column;
-  }
+  .dashboard { flex-direction: column; }
 
   .sidebar {
     width: 100%;
@@ -424,9 +422,11 @@
     height: auto;
     position: relative;
     flex-direction: row;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    justify-content: flex-start;
     align-items: center;
     padding: 10px 15px;
+    gap: 6px;
   }
 
   .logo-container {
@@ -434,76 +434,31 @@
     width: auto;
     top: unset;
     left: unset;
-    margin-right: 20px;
+    margin-right: 10px;
+    pointer-events: all;
   }
 
-  .logo {
-    width: 120px;
-    margin: 0;
+  .logo { width: 80px; margin: 0; }
+
+  .sidebar button {
+    width: auto;
+    padding: 8px 12px;
+    font-size: 13px;
   }
 
-  .main {
-    padding: 20px;
-  }
-
-  .artist-row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .album-cover-styled {
-    width: 100%;
-    max-width: 300px;
-  }
-
-  .version-format {
-    display: flex;
-    align-items: center;
+  .sidebar-bottom {
+    flex-direction: row;
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
     gap: 6px;
   }
 
-  .version-description {
-    font-size: 12px;
-    color: #aaa;
-    margin-top: 4px;
-  }
+  .main { padding: 16px; }
 
-  .ean-code {
-    font-size: 12px;
-    color: #888;
-  }
+  .artist-row { flex-direction: column; align-items: flex-start; }
+  .album-cover-styled { width: 100%; max-width: 280px; }
 
-  .version-left {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .version-top {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .add-pill {
-    margin-left: 6px;
-    background: rgba(168, 85, 247, 0.12);
-    color: #a855f7;
-    border: 1px solid rgba(168, 85, 247, 0.25);
-    border-radius: 999px;
-    width: 22px;
-    height: 22px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    padding: 0;
-    transition: all 0.2s ease;
-  }
-
-  .add-pill:hover {
-    background: #a855f7;
-    color: #fff;
-  }
+  .version-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .modal { max-width: 95vw; padding: 20px; }
 }

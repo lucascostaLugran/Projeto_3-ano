@@ -78,7 +78,7 @@ export class Profile {
         setTimeout(() => {
           this.error = '';
           this.cdr.detectChanges();
-        }, 2000);
+        }, 4000);
       }
     });
   }
@@ -110,7 +110,7 @@ export class Profile {
         setTimeout(() => {
           this.error = '';
           this.cdr.detectChanges();
-        }, 2000);
+        }, 4000);
 
         return;
       }
@@ -122,7 +122,7 @@ export class Profile {
         setTimeout(() => {
           this.error = '';
           this.cdr.detectChanges();
-        }, 2000);
+        }, 4000);
 
         return;
       }
@@ -146,7 +146,7 @@ export class Profile {
         setTimeout(() => {
           this.error = '';
           this.cdr.detectChanges();
-        }, 2000);
+        }, 4000);
 
         return;
       }
@@ -180,7 +180,7 @@ export class Profile {
         setTimeout(() => {
           this.message = '';
           this.cdr.detectChanges();
-        }, 2000);
+        }, 4000);
       },
       error: (err: any) => {
         this.error = err.error?.message || 'Erro ao atualizar perfil';
@@ -189,7 +189,7 @@ export class Profile {
         setTimeout(() => {
           this.error = '';
           this.cdr.detectChanges();
-        }, 2000);
+        }, 4000);
       }
     });
   }
@@ -214,7 +214,7 @@ export class Profile {
         setTimeout(() => {
           this.message = '';
           this.cdr.detectChanges();
-        }, 2000);
+        }, 4000);
       },
       error: (err) => {
         this.error = err.error?.message || 'Erro ao remover artista favorito';
@@ -223,7 +223,7 @@ export class Profile {
         setTimeout(() => {
           this.error = '';
           this.cdr.detectChanges();
-        }, 2000);
+        }, 4000);
       }
     });
   }

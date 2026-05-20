@@ -244,31 +244,46 @@
 }
 
 @media (max-width: 768px) {
-  .dashboard {
-    flex-direction: column;
-  }
+  .dashboard { flex-direction: column; }
 
   .sidebar {
     width: 100%;
     min-width: unset;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 15px;
     height: auto;
     position: relative;
-  }
-
-  .main {
+    flex-direction: row;
+    flex-wrap: wrap;
     justify-content: flex-start;
-    padding-top: 30px;
+    align-items: center;
+    padding: 10px 15px;
+    gap: 6px;
   }
 
-  .logo {
-    height: 50px;
+  .logo-container {
+    position: relative;
     width: auto;
-    margin: 0;
+    top: unset;
+    left: unset;
+    margin-right: 10px;
   }
+
+  .logo { width: 80px; height: auto; margin: 0; }
+
+  .sidebar button {
+    width: auto;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .sidebar-bottom {
+    flex-direction: row;
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
+    gap: 6px;
+  }
+
+  .main { padding: 16px; }
 }
 
 .fav-remove {
@@ -386,6 +401,7 @@
   border: 1px solid #2a2a3a;
   animation: slideDown 0.3s ease;
 }
+
 
 @keyframes slideDown {
   from {

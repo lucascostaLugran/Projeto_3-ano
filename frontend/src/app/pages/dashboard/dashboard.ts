@@ -15,9 +15,7 @@ import { debounceTime } from 'rxjs/operators';
 })
 export class Dashboard implements OnInit, OnDestroy {
 
-  user: any = {
-    username: ''
-  };
+  user: any = { username: '' };
 
   searchTerm = '';
   searchType: 'artist' | 'album' = 'artist';
@@ -27,47 +25,43 @@ export class Dashboard implements OnInit, OnDestroy {
 
   message = '';
   error = '';
-
   token: string = '';
 
   notifications: any[] = [];
-
   isNotifOpen = false;
+
+  lastCollectionAlbum: any = null;
+  topList: any = null;
+  pendingRequestsCount: number = 0;
 
   private ws: WebSocket | null = null;
 
   constructor(
     private http: HttpClient,
-    private router: Router,
+    public router: Router,
     private cdr: ChangeDetectorRef
-  ) { }
+  ) {}
 
   ngOnInit() {
-
     if (typeof window !== 'undefined') {
       this.token = localStorage.getItem('token') || '';
     }
-
     if (!this.token) {
       this.router.navigate(['/login']);
       return;
     }
-
     this.loadProfile();
     this.loadNotifications();
+    this.loadQuickStats();
     this.connectWebSocket();
 
-    this.searchSubject.pipe(
-      debounceTime(300)
-    ).subscribe(() => {
+    this.searchSubject.pipe(debounceTime(300)).subscribe(() => {
       this.search();
     });
   }
 
   ngOnDestroy() {
-    if (this.ws) {
-      this.ws.close();
-    }
+    if (this.ws) this.ws.close();
   }
 
   connectWebSocket() {
@@ -89,62 +83,82 @@ export class Dashboard implements OnInit, OnDestroy {
   }
 
   getAuthHeaders() {
-    return {
-      Authorization: `Bearer ${this.token}`
-    };
+    return { Authorization: `Bearer ${this.token}` };
   }
 
   loadProfile() {
     this.http.get('http://localhost:3000/auth/profile', {
       headers: this.getAuthHeaders()
-    })
-      .subscribe({
-        next: (res: any) => {
-          this.user = { ...res };
-          this.cdr.detectChanges();
-        },
-        error: () => {
-          this.error = 'Erro ao carregar o perfil do utilizador.';
-          this.cdr.detectChanges();
+    }).subscribe({
+      next: (res: any) => {
+        this.user = { ...res };
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.error = 'Erro ao carregar o perfil do utilizador.';
+        this.cdr.detectChanges();
+        setTimeout(() => { this.error = ''; this.cdr.detectChanges(); }, 4000);
+      }
+    });
+  }
 
-          setTimeout(() => {
-            this.error = '';
-            this.cdr.detectChanges();
-          }, 2000);
+  loadQuickStats() {
+    this.http.get<any[]>('http://localhost:3000/albums/collection', {
+      headers: this.getAuthHeaders()
+    }).subscribe({
+      next: (res) => {
+        if (res && res.length > 0) {
+          const sorted = [...res].sort((a, b) =>
+            new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime()
+          );
+          this.lastCollectionAlbum = sorted[0];
         }
-      });
+        this.cdr.detectChanges();
+      },
+      error: () => {}
+    });
+
+    this.http.get<any[]>('http://localhost:3000/auth/lists', {
+      headers: this.getAuthHeaders()
+    }).subscribe({
+      next: (res) => {
+        if (res && res.length > 0) {
+          this.topList = res.reduce((prev: any, curr: any) =>
+            curr.albumCount > prev.albumCount ? curr : prev
+          );
+        }
+        this.cdr.detectChanges();
+      },
+      error: () => {}
+    });
+
+    this.http.get<any[]>('http://localhost:3000/requests', {
+      headers: this.getAuthHeaders()
+    }).subscribe({
+      next: (res) => {
+        this.pendingRequestsCount = res ? res.length : 0;
+        this.cdr.detectChanges();
+      },
+      error: () => {}
+    });
   }
 
   addFavorite(artistId: string) {
     this.message = '';
     this.error = '';
-
-    this.http.post(
-      `http://localhost:3000/artists/${artistId}/favorite`,
-      {},
-      {
-        headers: this.getAuthHeaders()
-      }
-    ).subscribe({
+    this.http.post(`http://localhost:3000/artists/${artistId}/favorite`, {}, {
+      headers: this.getAuthHeaders()
+    }).subscribe({
       next: (res: any) => {
         this.message = res.message || 'Atualizado com sucesso';
         this.cdr.detectChanges();
-
         this.loadProfile();
-
-        setTimeout(() => {
-          this.message = '';
-          this.cdr.detectChanges();
-        }, 2000);
+        setTimeout(() => { this.message = ''; this.cdr.detectChanges(); }, 4000);
       },
       error: (err: any) => {
         this.error = err.error?.message || 'Erro ao definir favorito';
         this.cdr.detectChanges();
-
-        setTimeout(() => {
-          this.error = '';
-          this.cdr.detectChanges();
-        }, 2000);
+        setTimeout(() => { this.error = ''; this.cdr.detectChanges(); }, 4000);
       }
     });
   }
@@ -152,7 +166,6 @@ export class Dashboard implements OnInit, OnDestroy {
   search() {
     this.error = '';
     this.message = '';
-
     const term = this.searchTerm.trim();
 
     if (!term) {
@@ -164,171 +177,107 @@ export class Dashboard implements OnInit, OnDestroy {
     }
 
     if (this.searchType === 'artist') {
-
-      this.http.get(`http://localhost:3000/artists/search?name=${term}`)
-        .subscribe({
-          next: (res: any) => {
-            this.artists = res;
-            this.albums = [];
-            this.cdr.detectChanges();
-          },
-          error: (err: any) => {
-            this.artists = [];
-            this.error = err.error?.message || 'Nenhum artista encontrado.';
-            this.cdr.detectChanges();
-          }
-        });
-
+      this.http.get(`http://localhost:3000/artists/search?name=${term}`).subscribe({
+        next: (res: any) => {
+          this.artists = res;
+          this.albums = [];
+          this.cdr.detectChanges();
+        },
+        error: (err: any) => {
+          this.artists = [];
+          this.error = err.error?.message || 'Nenhum artista encontrado.';
+          this.cdr.detectChanges();
+        }
+      });
     } else {
-
-      this.http.get(`http://localhost:3000/albums/search?title=${term}`)
-        .subscribe({
-          next: (res: any) => {
-            this.albums = Array.isArray(res) ? res : [];
-            this.artists = [];
-            if (this.albums.length === 0) {
-              this.error = 'Nenhum álbum encontrado.';
-            }
-            this.cdr.detectChanges();
-          },
-          error: (err: any) => {
-            this.albums = [];
-            this.error = err.error?.message || 'Nenhum álbum encontrado.';
-            this.cdr.detectChanges();
-          }
-        });
+      this.http.get(`http://localhost:3000/albums/search?title=${term}`).subscribe({
+        next: (res: any) => {
+          this.albums = Array.isArray(res) ? res : [];
+          this.artists = [];
+          if (this.albums.length === 0) this.error = 'Nenhum álbum encontrado.';
+          this.cdr.detectChanges();
+        },
+        error: (err: any) => {
+          this.albums = [];
+          this.error = err.error?.message || 'Nenhum álbum encontrado.';
+          this.cdr.detectChanges();
+        }
+      });
     }
   }
 
   onSearchChange() {
     this.searchSubject.next(this.searchTerm);
   }
-  goToArtist(id: string) {
-    this.router.navigate(['/artist', id]);
-  }
-  goToAlbum(id: string) {
-    this.router.navigate(['/album', id]);
-  }
+
+  goToArtist(id: string) { this.router.navigate(['/artist', id]); }
+  goToAlbum(id: string) { this.router.navigate(['/album', id]); }
 
   loadNotifications() {
-
     this.http.get('http://localhost:3000/notifications', {
       headers: this.getAuthHeaders()
-    })
-
-      .subscribe({
-
-        next: (res: any) => {
-          this.notifications = res;
-          this.cdr.detectChanges();
-        },
-
-        error: (err) => {
-          console.error('Erro ao carregar notificações:', err);
-        }
-
-      });
+    }).subscribe({
+      next: (res: any) => {
+        this.notifications = res;
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Erro ao carregar notificações:', err)
+    });
   }
 
   toggleNotifications() {
-
     this.isNotifOpen = !this.isNotifOpen;
-
     if (this.isNotifOpen) {
-
       this.notifications.forEach(n => {
-
         if (!n.read) {
-
-          this.http.patch(
-            `http://localhost:3000/notifications/${n._id}/read`,
-            {},
-            {
-              headers: this.getAuthHeaders()
-            }
-          ).subscribe();
-
+          this.http.patch(`http://localhost:3000/notifications/${n._id}/read`, {}, {
+            headers: this.getAuthHeaders()
+          }).subscribe();
           n.read = true;
         }
-
       });
-
     }
-
     this.cdr.detectChanges();
   }
 
   deleteNotification(id: string) {
-
-    this.http.delete(
-      `http://localhost:3000/notifications/${id}`,
-      {
-        headers: this.getAuthHeaders()
-      }
-    )
-
-      .subscribe({
-
-        next: () => {
-
-          this.notifications =
-            this.notifications.filter(n => n._id !== id);
-
-          this.cdr.detectChanges();
-        },
-
-        error: (err) => {
-          console.error('Erro ao remover notificação:', err);
-        }
-
-      });
+    this.http.delete(`http://localhost:3000/notifications/${id}`, {
+      headers: this.getAuthHeaders()
+    }).subscribe({
+      next: () => {
+        this.notifications = this.notifications.filter(n => n._id !== id);
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Erro ao remover notificação:', err)
+    });
   }
 
   clearNotifications() {
-
-    this.http.delete(
-      `http://localhost:3000/notifications`,
-      {
-        headers: this.getAuthHeaders()
-      }
-    )
-
-      .subscribe({
-
-        next: () => {
-
-          this.notifications = [];
-          this.cdr.detectChanges();
-        },
-
-        error: (err) => {
-          console.error('Erro ao limpar notificações:', err);
-        }
-
-      });
+    this.http.delete('http://localhost:3000/notifications', {
+      headers: this.getAuthHeaders()
+    }).subscribe({
+      next: () => {
+        this.notifications = [];
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Erro ao limpar notificações:', err)
+    });
   }
 
   getUnreadCount(): number {
-
     return this.notifications.filter(n => !n.read).length;
   }
 
   goToNotificationAlbum(notification: any) {
-
     const albumId = notification.request?.album?._id;
-
     if (albumId) {
-
       this.isNotifOpen = false;
-
       this.router.navigate(['/album', albumId]);
     }
   }
 
   logout() {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('token');
-    }
+    if (typeof window !== 'undefined') localStorage.removeItem('token');
     this.router.navigate(['/login']);
   }
 }

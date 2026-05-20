@@ -154,7 +154,7 @@
           setTimeout(() => {
             this.message = '';
             this.cdr.detectChanges();
-          }, 2000);
+          }, 4000);
         },
         error: (err: any) => {
           this.error = err.error?.message || 'Erro ao remover';
@@ -164,7 +164,7 @@
           setTimeout(() => {
             this.error = '';
             this.cdr.detectChanges();
-          }, 2000);
+          }, 4000);
         }
       });
     }

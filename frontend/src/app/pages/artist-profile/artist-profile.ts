@@ -98,7 +98,7 @@ export class ArtistProfile implements OnInit {
         setTimeout(() => {
           this.message = '';
           this.cdr.detectChanges();
-        }, 2000);
+        }, 4000);
       },
       error: (err: any) => {
         this.message = err.error?.message || 'Erro ao atualizar favorito';
@@ -109,7 +109,7 @@ export class ArtistProfile implements OnInit {
         setTimeout(() => {
           this.message = '';
           this.cdr.detectChanges();
-        }, 2000);
+        }, 4000);
       }
     });
   }
